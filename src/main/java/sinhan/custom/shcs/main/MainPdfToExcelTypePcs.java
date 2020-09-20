@@ -103,7 +103,7 @@ public class MainPdfToExcelTypePcs {
         pcs = splitTargetForPcs[splitTargetForPcs.length - 1].replace(",", "");
         for (String target : splitTargetForMaterialNo) {
             if (target.length() == 13 && target.contains(".")) {
-//                String origin = extractOrigin(nextLine);
+                String origin = extractOrigin(nextLine);
                 materialNo = target.replace(".", "");
                 PDFExtractData pdfExtractData = new PDFExtractData(invoiceOrder,invoiceNo, materialNo, Double.valueOf(pcs), origin);
                 dataList.add(pdfExtractData);
