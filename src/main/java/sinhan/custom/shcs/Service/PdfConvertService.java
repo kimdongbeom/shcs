@@ -99,8 +99,8 @@ public class PdfConvertService {
         for (String target : splitTargetForMaterialNo) {
             if (target.length() == 13 && target.contains(".")) {
                 materialNo = target.replace(".", "");
-                PDFExtractData pdfExtractData = new PDFExtractData(materialNo, Double.valueOf(pcs));
-                dataList.add(pdfExtractData);
+//                PDFExtractData pdfExtractData = new PDFExtractData(materialNo, Double.valueOf(pcs));
+//                dataList.add(pdfExtractData);
             }
         }
     }

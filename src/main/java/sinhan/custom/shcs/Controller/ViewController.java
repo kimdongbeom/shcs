@@ -30,7 +30,7 @@ public class ViewController {
         String excelName = fileName.split(".pdf")[0] + "_converted_excel.xls";
         for (String value : inputValues) {
             String[] splitValue = value.split(",");
-            PDFExtractData pdfExtractData = new PDFExtractData(splitValue[0], Double.valueOf(splitValue[1]));
+            PDFExtractData pdfExtractData = new PDFExtractData(Integer.parseInt(splitValue[0]), Integer.parseInt(splitValue[1]), splitValue[2], Double.valueOf(splitValue[3]));
             dataList.add(pdfExtractData);
         }
         model.addAttribute("rows", dataList);

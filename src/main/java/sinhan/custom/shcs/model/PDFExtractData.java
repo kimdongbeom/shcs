@@ -1,6 +1,5 @@
 package sinhan.custom.shcs.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +10,17 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PDFExtractData {
+    private int invoiceOrder;
+    private int invoiceNo;
     private String materialNo;
     private Double quantity;
+    private String origin;
+
+    public PDFExtractData (int invoiceOrder, int invoiceNo, String materialNo, Double quantity) {
+        this.invoiceOrder = invoiceOrder;
+        this.invoiceNo = invoiceNo;
+        this.materialNo = materialNo;
+        this.quantity = quantity;
+    }
+
 }

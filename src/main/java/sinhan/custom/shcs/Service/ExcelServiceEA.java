@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class ExcelService {
+public class ExcelServiceEA {
 
     public void excelWrite(List<PDFExtractData> dataList, String outputPath) {
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -23,9 +23,21 @@ public class ExcelService {
         HSSFCell cell;
 
         cell = row.createCell(0);
-        cell.setCellValue("MaterialId");
+        cell.setCellValue("code");
 
         cell = row.createCell(1);
+        cell.setCellValue("InvoiceOrder");
+
+        cell = row.createCell(2);
+        cell.setCellValue("InvoiceNo");
+
+        cell = row.createCell(3);
+        cell.setCellValue("MaterialId");
+
+        cell = row.createCell(4);
+        cell.setCellValue("E");
+
+        cell = row.createCell(5);
         cell.setCellValue("Quantity");
 
         int dataRowStartIndex = 1;
@@ -33,9 +45,21 @@ public class ExcelService {
             row = sheet.createRow(dataRowStartIndex);
 
             cell = row.createCell(0);
-            cell.setCellValue(data.getMaterialNo());
+            cell.setCellValue(5002);
 
             cell = row.createCell(1);
+            cell.setCellValue(data.getInvoiceOrder());
+
+            cell = row.createCell(2);
+            cell.setCellValue(data.getInvoiceNo());
+
+            cell = row.createCell(3);
+            cell.setCellValue(data.getMaterialNo());
+
+            cell = row.createCell(4);
+            cell.setCellValue("");
+
+            cell = row.createCell(5);
             cell.setCellValue(data.getQuantity());
 
             dataRowStartIndex ++;
