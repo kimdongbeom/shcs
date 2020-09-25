@@ -1,7 +1,6 @@
 package sinhan.custom.shcs.ExcelView;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -12,8 +11,6 @@ import sinhan.custom.shcs.model.PDFExtractData;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +28,21 @@ public class ExcelView extends AbstractXlsView {
         Cell cell;
 
         cell = row.createCell(0);
-        cell.setCellValue("MaterialId");
+        cell.setCellValue("code");
 
         cell = row.createCell(1);
+        cell.setCellValue("InvoiceOrder");
+
+        cell = row.createCell(2);
+        cell.setCellValue("InvoiceNo");
+
+        cell = row.createCell(3);
+        cell.setCellValue("MaterialId");
+
+        cell = row.createCell(4);
+        cell.setCellValue("E");
+
+        cell = row.createCell(5);
         cell.setCellValue("Quantity");
 
         int dataRowStartIndex = 1;
@@ -41,9 +50,21 @@ public class ExcelView extends AbstractXlsView {
             row = sheet.createRow(dataRowStartIndex);
 
             cell = row.createCell(0);
-            cell.setCellValue(data.getMaterialNo());
+            cell.setCellValue(5002);
 
             cell = row.createCell(1);
+            cell.setCellValue(data.getInvoiceOrder());
+
+            cell = row.createCell(2);
+            cell.setCellValue(data.getInvoiceNo());
+
+            cell = row.createCell(3);
+            cell.setCellValue(data.getMaterialNo());
+
+            cell = row.createCell(4);
+            cell.setCellValue("");
+
+            cell = row.createCell(5);
             cell.setCellValue(data.getQuantity());
 
             dataRowStartIndex ++;

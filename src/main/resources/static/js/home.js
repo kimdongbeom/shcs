@@ -8,7 +8,6 @@ $(document).ready(function() {
         var form = $('#fileUploadForm')[0];
         var data = new FormData(form);
         var fileName = $('input[type=file]').val().replace(/.*(\/|\\)/, '');
-        debugger;
         $("#btnSubmit").prop("disabled", true);
         $.ajax({
             type: 'POST',
@@ -19,14 +18,22 @@ $(document).ready(function() {
             contentType: false,
             cache: false,
             success: function(data) {
-                windowOpenInPost(fileName, data)
-                $("#btnSubmit").prop("disabled", false);
+                if (data.length == 0) {
+                    alert("변환된 Excel이 빈값입니다. \nPDF파일 혹은 PDF타입을 다시 확인해주세요.");
+                    $("#btnSubmit").prop("disabled", false);
+                } else {
+                    windowOpenInPost(fileName, data)
+                    $("#btnSubmit").prop("disabled", false);
+                }
             }
         })
+
+        e.stopPropagation();
     })
 
     function windowOpenInPost(fileName, dataList)
     {
+        debugger;
         var mapForm = document.createElement("form");
         mapForm.method = "POST";
         mapForm.target="target";
@@ -41,14 +48,14 @@ $(document).ready(function() {
                 var mapInput = document.createElement("input");
                 mapInput.type = "hidden";
                 mapInput.name = 'data';
-                mapInput.value = dataList[i].materialNo + "," +dataList[i].quantity;
+                mapInput.value = dataList[i].invoiceOrder + "," + dataList[i].invoiceNo +"," + dataList[i].materialNo + "," +dataList[i].quantity;
+                debugger;
                 mapForm.appendChild(mapInput);
 
             }
             document.body.appendChild(mapForm);
         }
 
-        debugger;
         map = window.open("","_self");
         if (map) {
             mapForm.submit();

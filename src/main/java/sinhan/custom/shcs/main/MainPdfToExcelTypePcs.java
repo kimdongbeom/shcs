@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import sinhan.custom.shcs.Service.ExcelServicePcs;
+import sinhan.custom.shcs.Service.ExcelService;
 import sinhan.custom.shcs.model.PDFExtractData;
 
 import java.io.File;
@@ -17,82 +17,92 @@ public class MainPdfToExcelTypePcs {
     public static int invoiceOrder = 1;
 
     public static void main(String[] args) {
-        try {
+        if (args.length == 2) {
+            String inputFile = args[0];
+            String outputPath = args[1];
+
+            try {
 //            File file = new File("/Users/nhnent/Desktop/S8R0012857.pdf");
 //            File file = new File("/Users/nhnent/Desktop/shcs/RBO500291.pdf");
 //            File file = new File("/Users/nhnent/Desktop/shcs/0917_PEN9040664_YO.pdf");
-            File file = new File("/Users/nhnent/Desktop/shcs/0917_PEN9040664_YO.pdf");
-            PDDocument document = PDDocument.load(file);
-            PDFTextStripper pdfStripper = new PDFTextStripper();
+                File file = new File(inputFile);
+                PDDocument document = PDDocument.load(file);
+                PDFTextStripper pdfStripper = new PDFTextStripper();
 //            pdfStripper.setStartPage(3);
 //            pdfStripper.setEndPage(3);
 
-            //load all lines into a string
-            String pages = pdfStripper.getText(document);
+                //load all lines into a string
+                String pages = pdfStripper.getText(document);
 
-            //split by detecting newline
-            String[] lines = pages.split("\r\n|\r|\n");
-            List<PDFExtractData> dataList = new ArrayList<>();
+                //split by detecting newline
+                String[] lines = pages.split("\r\n|\r|\n");
+                List<PDFExtractData> dataList = new ArrayList<>();
 
-            int invoiceNo = 0;
-            boolean isTargetBlock = false;
-            for (int i = 0; i < lines.length; i++) {
-                String line = lines[i];
+                int invoiceNo = 0;
+                boolean isTargetBlock = false;
+                for (int i = 0; i < lines.length; i++) {
+                    String line = lines[i];
 
-                if (line.startsWith("Invoice No.")) {
-                    String[] splitLine = line.split("Invoice No.");
-                    if (splitLine.length == 2) {
-                        String invoice = splitLine[1].replaceAll(" ", "");
-                        if (StringUtils.isNumeric(invoice)) {
-                            int newInvoiceNo = Integer.parseInt(invoice);
+                    if (line.startsWith("Invoice No.")) {
+                        String[] splitLine = line.split("Invoice No.");
+                        if (splitLine.length == 2) {
+                            String invoice = splitLine[1].replaceAll(" ", "");
+                            if (StringUtils.isNumeric(invoice)) {
+                                int newInvoiceNo = Integer.parseInt(invoice);
 
-                            if (invoiceNo != newInvoiceNo) {
-                                invoiceOrder = 1;
+                                if (invoiceNo != newInvoiceNo) {
+                                    invoiceOrder = 1;
+                                }
+                                invoiceNo = newInvoiceNo;
                             }
-                            invoiceNo = newInvoiceNo;
+                        }
+                    }
+
+                    if (line.startsWith("Delivery no.") && line.contains("Material no.")) {
+                        isTargetBlock = true;
+                    }
+
+                    if (line.contains("Sub total")) {
+                        isTargetBlock = false;
+                    }
+
+                    if (isTargetBlock) {
+                        if (line.contains("pcs")) {
+                            String materialNo = "";
+                            String pcs = "";
+
+                            String[] splitTargetForMaterialNo = line.split(" ");
+
+                            int pcsCount = 0;
+                            for (String word : splitTargetForMaterialNo) {
+                                if (word.contains("pcs")) {
+                                    pcsCount++;
+                                }
+                            }
+
+                            if (pcsCount == 1) {
+                                String targetForPcs = line.split("pcs")[0];
+                                setExcelData(lines[i+1], invoiceNo, dataList, splitTargetForMaterialNo, targetForPcs);
+                            } else if (pcsCount == 2){
+                                // ex : "14.880 2.608.577.147 Case L - 35pcs Multi VN 82079030 Accessory Set  24 pcs"; => pcs가 두 번 들어 있음
+                                String targetForPcs = line.split("pcs")[1].split("pcs")[0];
+                                setExcelData(lines[i+1], invoiceNo, dataList, splitTargetForMaterialNo, targetForPcs);
+                            }
                         }
                     }
                 }
 
-                if (line.startsWith("Delivery no.") && line.contains("Material no.")) {
-                    isTargetBlock = true;
-                }
-
-                if (line.contains("Sub total")) {
-                    isTargetBlock = false;
-                }
-
-                if (isTargetBlock) {
-                    if (line.contains("pcs")) {
-                        String materialNo = "";
-                        String pcs = "";
-
-                        String[] splitTargetForMaterialNo = line.split(" ");
-
-                        int pcsCount = 0;
-                        for (String word : splitTargetForMaterialNo) {
-                            if (word.contains("pcs")) {
-                                pcsCount++;
-                            }
-                        }
-
-                        if (pcsCount == 1) {
-                            String targetForPcs = line.split("pcs")[0];
-                            setExcelData(lines[i+1], invoiceNo, dataList, splitTargetForMaterialNo, targetForPcs);
-                        } else if (pcsCount == 2){
-                            // ex : "14.880 2.608.577.147 Case L - 35pcs Multi VN 82079030 Accessory Set  24 pcs"; => pcs가 두 번 들어 있음
-                            String targetForPcs = line.split("pcs")[1].split("pcs")[0];
-                            setExcelData(lines[i+1], invoiceNo, dataList, splitTargetForMaterialNo, targetForPcs);
-                        }
-                    }
-                }
+                String excelName = inputFile.split(".pdf")[0] + "_converted_excel.xls";
+                ExcelService excelService = new ExcelService();
+                excelService.excelWrite(dataList, outputPath + excelName);
+            } catch(Exception e) {
+                log.error("Pdf Convert Error [TYPE1]", e);
             }
-
-            ExcelServicePcs excelService = new ExcelServicePcs();
-            excelService.excelWrite(dataList, "/Users/nhnent/Desktop/shcs/0917_PEN9040664_YO_result.xls");
-        } catch(Exception e) {
-            log.error("Pdf Convert Error [TYPE1]", e);
+        } else {
+            System.out.println(" Proper usage : java -jar sinhan.custom.shcs.main.MainPdfToExcelTypePcs inputFileLocation outputFileLocation");
+            System.exit(0);
         }
+
     }
 
     private static void setExcelData(String nextLine, int invoiceNo, List<PDFExtractData> dataList, String[] splitTargetForMaterialNo, String targetForPcs) {
@@ -103,20 +113,11 @@ public class MainPdfToExcelTypePcs {
         pcs = splitTargetForPcs[splitTargetForPcs.length - 1].replace(",", "");
         for (String target : splitTargetForMaterialNo) {
             if (target.length() == 13 && target.contains(".")) {
-                String origin = extractOrigin(nextLine);
                 materialNo = target.replace(".", "");
-                PDFExtractData pdfExtractData = new PDFExtractData(invoiceOrder,invoiceNo, materialNo, Double.valueOf(pcs), origin);
+                PDFExtractData pdfExtractData = new PDFExtractData(invoiceOrder,invoiceNo, materialNo, Double.valueOf(pcs));
                 dataList.add(pdfExtractData);
+                invoiceOrder += 1;
             }
         }
-    }
-
-    private static String extractOrigin(String nextLine) {
-        String[] splitLine = nextLine.split(" ");
-        String origin = splitLine[1];
-        if (origin.length() == 2) {
-            return origin;
-        }
-        return "No Origin";
     }
 }

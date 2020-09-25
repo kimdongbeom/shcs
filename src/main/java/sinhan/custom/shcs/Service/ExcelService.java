@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class ExcelServiceEA {
+public class ExcelService {
 
     public void excelWrite(List<PDFExtractData> dataList, String outputPath) {
         HSSFWorkbook workbook = new HSSFWorkbook();

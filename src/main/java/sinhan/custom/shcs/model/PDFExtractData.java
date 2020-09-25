@@ -14,13 +14,4 @@ public class PDFExtractData {
     private int invoiceNo;
     private String materialNo;
     private Double quantity;
-    private String origin;
-
-    public PDFExtractData (int invoiceOrder, int invoiceNo, String materialNo, Double quantity) {
-        this.invoiceOrder = invoiceOrder;
-        this.invoiceNo = invoiceNo;
-        this.materialNo = materialNo;
-        this.quantity = quantity;
-    }
-
 }

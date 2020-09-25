@@ -13,30 +13,24 @@
 <body>
     <div class="container">
         <div class="header">
-<!--            <nav>-->
-<!--                <ul class="nav nav-pills pull-right">-->
-<!--                    <li role="presentation" class="active"><a href="#">Home</a></li>-->
-<!--                    <li role="presentation"><a href="#">About</a></li>-->
-<!--                    <li role="presentation"><a href="#">Contact</a></li>-->
-<!--                </ul>-->
-<!--            </nav>-->
             <h3 class="text-muted">신한관세법인</h3>
         </div>
 
         <div class="jumbotron">
             <h1>PDF Excel 변환</h1>
-            <p class="lead">S8R0013325.pdf 포맷 형태만 가능하도록 웹에서 작업되어있습니다 </p>
+            <p class="lead"><h5>변환전 PDF와 PDF포맷을 확인해주세요! 이미지형태의 PDF는 변환이 되지 않습니다.</h5></p>
             <form id="fileUploadForm" method="POST" enctype="multipart/form-data">
                 <input id="upload_pdf" name="file" type="file" accept="application/pdf, application/vnd.ms-excel" />
-                <button id="btnSubmit" type="button" class="btn btn-primary" style="margin-top: 5px;">Excel변환</button>
+                <div style="display: flex;">
+                    <select name="type" class="form-control" style="width: 22%;margin-top: 5px;margin-right: 5px;">
+                        <option value="EA">BOSCH_TYPE_EA</option>
+                        <option value="PCS">BOSCH_TYPE_PCS</option>
+                    </select>
+                    <button id="btnSubmit" type="button" class="btn btn-primary" style="margin-top: 5px;">Excel변환</button>
+                </div>
             </form>
         </div>
-
-        </div>
-
-<!--        <footer class="footer">-->
-<!--            <p>© Company 2014</p>-->
-<!--        </footer>-->
+    </div>
 
     </div>
     <script type="text/javascript" src="../static/js/home.js"></script>
