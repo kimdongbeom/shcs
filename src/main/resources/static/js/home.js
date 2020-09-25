@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    console.log("test hahaha");
 
     $("#btnSubmit").click(function (e) {
 
@@ -33,7 +32,6 @@ $(document).ready(function() {
 
     function windowOpenInPost(fileName, dataList)
     {
-        debugger;
         var mapForm = document.createElement("form");
         mapForm.method = "POST";
         mapForm.target="target";
@@ -49,7 +47,6 @@ $(document).ready(function() {
                 mapInput.type = "hidden";
                 mapInput.name = 'data';
                 mapInput.value = dataList[i].invoiceOrder + "," + dataList[i].invoiceNo +"," + dataList[i].materialNo + "," +dataList[i].quantity;
-                debugger;
                 mapForm.appendChild(mapInput);
 
             }
