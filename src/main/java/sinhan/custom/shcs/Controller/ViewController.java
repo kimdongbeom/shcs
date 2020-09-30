@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import sinhan.custom.shcs.ExcelView.ExcelView;
+import sinhan.custom.shcs.ExcelView.BoschExcelView;
+import sinhan.custom.shcs.ExcelView.LenovoExcelView;
+import sinhan.custom.shcs.model.Lenovo;
 import sinhan.custom.shcs.model.PDFExtractData;
 
 import javax.servlet.http.HttpServletResponse;
@@ -17,15 +19,13 @@ import java.util.List;
 public class ViewController {
 
     @GetMapping("/")
-    public ModelAndView main() {
-        ModelAndView modelAndView = new ModelAndView();
-
-        modelAndView.setViewName("home");
-        return modelAndView;
+    public String main(Model model, @RequestParam(value = "param", defaultValue = "bosch") String param) {
+        model.addAttribute("service", param);
+        return "home";
     }
 
-    @PostMapping("/excel")
-    public ModelAndView getExcel(Model model, @RequestParam("fileName") String fileName, @RequestParam("data") List<String> inputValues, HttpServletResponse response) {
+    @PostMapping("/excel/bosch")
+    public ModelAndView getBoschExcel(Model model, @RequestParam("fileName") String fileName, @RequestParam("data") List<String> inputValues, HttpServletResponse response) {
         List<PDFExtractData> dataList = new ArrayList<>();
         String excelName = fileName.split(".pdf")[0] + "_converted_excel.xls";
         for (String value : inputValues) {
@@ -37,7 +37,23 @@ public class ViewController {
 
         response.setContentType("application/ms-excel");
         response.setHeader("Content-disposition", "attachment; filename=" + excelName);
-        return new ModelAndView(new ExcelView());
+        return new ModelAndView(new BoschExcelView());
+    }
+
+    @PostMapping("/excel/lenovo")
+    public ModelAndView getLenovoExcel(Model model, @RequestParam("fileName") String fileName, @RequestParam("data") List<String> inputValues, HttpServletResponse response) {
+        List<Lenovo> dataList = new ArrayList<>();
+        String excelName = fileName.split(".pdf")[0] + "_converted_excel.xls";
+        for (String value : inputValues) {
+            String[] splitValue = value.split(",");
+            Lenovo lenovo = new Lenovo(value);
+            dataList.add(lenovo);
+        }
+        model.addAttribute("rows", dataList);
+
+        response.setContentType("application/ms-excel");
+        response.setHeader("Content-disposition", "attachment; filename=" + excelName);
+        return new ModelAndView(new LenovoExcelView());
     }
 
 }

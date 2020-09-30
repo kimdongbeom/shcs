@@ -11,29 +11,51 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h3 class="text-muted">신한관세법인</h3>
-        </div>
+<div class="container">
+    <div class="header">
+        <h3 class="text-muted">신한관세법인</h3>
+    </div>
 
-        <div class="jumbotron">
-            <h1>PDF Excel 변환</h1>
+    <ul class="nav nav-tabs">
+        <li th:classappend="${service} == 'bosch' ? 'active' : ''"><a data-toggle="tab" href="#bosch">BOSCH</a></li>
+        <li th:classappend="${service} == 'lenovo' ? 'active' : ''"><a data-toggle="tab" href="#lenovo">LENOVO</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="bosch" th:classappend="${service} == 'bosch' ? 'in active' : ''" class="tab-pane fade">
+            <h3>BOSCH PDF Excel 변환</h3>
             <p class="lead"><h5>변환전 PDF와 PDF포맷을 확인해주세요! 이미지형태의 PDF는 변환이 되지 않습니다.</h5></p>
-            <form id="fileUploadForm" method="POST" enctype="multipart/form-data">
-                <input id="upload_pdf" name="file" type="file" accept="application/pdf, application/vnd.ms-excel" />
+            <form id="fileUploadFormBosch" method="POST" enctype="multipart/form-data">
+                <input id="uploadPdfBosch" name="file" type="file" accept="application/pdf, application/vnd.ms-excel"/>
                 <div style="display: flex;">
                     <select name="type" class="form-control" style="width: 22%;margin-top: 5px;margin-right: 5px;">
                         <option value="EA">BOSCH_TYPE_EA</option>
                         <option value="PCS">BOSCH_TYPE_PCS</option>
                     </select>
-                    <button id="btnSubmit" type="button" class="btn btn-primary" style="margin-top: 5px;">Excel변환</button>
+                    <button id="btnSubmitBosch" type="button" class="btn btn-primary" style="margin-top: 5px;">Excel변환</button>
+                </div>
+            </form>
+        </div>
+        <div id="lenovo" th:classappend="${service} == 'lenovo' ? 'in active' : ''" class="tab-pane fade">
+            <h3>LENOVO PDF Excel 변환</h3>
+            <p class="lead"><h5>변환전 PDF와 PDF포맷을 확인해주세요! 이미지형태의 PDF는 변환이 되지 않습니다.</h5></p>
+            <form id="fileUploadFormLenovo" method="POST" enctype="multipart/form-data">
+                <input id="uploadPdfLenovo" name="file" type="file" accept="application/pdf, application/vnd.ms-excel"/>
+                <div style="display: flex;">
+                    <select name="type" class="form-control" style="width: 22%;margin-top: 5px;margin-right: 5px;">
+                        <option value="DN">LENOVO_TYPE_DN</option>
+                        <option value="DEL">LENOVO_TYPE_DEL</option>
+                    </select>
+                    <button id="btnSubmitLenovo" type="button" class="btn btn-primary" style="margin-top: 5px;">Excel변환</button>
                 </div>
             </form>
         </div>
     </div>
+</div>
 
-    </div>
-    <script type="text/javascript" src="../static/js/home.js"></script>
+</div>
+<script type="text/javascript" src="../static/js/bosch.js"></script>
+<script type="text/javascript" src="../static/js/lenovo.js"></script>
 </body>
 <script>
 

@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Component("ConvertedXls")
-public class ExcelView extends AbstractXlsView {
+@Component("ConvertedBoschXls")
+public class BoschExcelView extends AbstractXlsView {
 
     @Override
     protected void buildExcelDocument(Map<String, Object> model, Workbook workbook, HttpServletRequest request, HttpServletResponse response) throws Exception {

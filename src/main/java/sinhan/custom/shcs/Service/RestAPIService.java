@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import sinhan.custom.shcs.model.Lenovo;
 import sinhan.custom.shcs.model.PDFExtractData;
 
 import java.io.File;
@@ -21,14 +22,31 @@ public class RestAPIService {
     @Autowired
     private TypePCSConvertService typePCSConvertService;
 
+    @Autowired
+    private TypeLenovoDNConvertService typeLenovoDNConvertService;
 
-    public List<PDFExtractData> makeExcelFileUsingUploadedPdf(MultipartFile multipartFile, String type) {
+    @Autowired
+    private TypeLenovoDELConvertService typeLenovoDELConvertService;
+
+
+    public List<PDFExtractData> makeExcelUsingBoschPdf(MultipartFile multipartFile, String type) {
         File file = convertFile(multipartFile);
         List<PDFExtractData> transferDatas = new ArrayList<>();
         if (type.equals("EA")) {
             transferDatas = typeEAConvertService.convertTypeEA(file);
         } else if (type.equals("PCS")) {
             transferDatas = typePCSConvertService.convertTypePCS(file);
+        }
+        return transferDatas;
+    }
+
+    public List<Lenovo> makeExcelUsingLenovoPdf(MultipartFile multipartFile, String type) {
+        File file = convertFile(multipartFile);
+        List<Lenovo> transferDatas = new ArrayList<>();
+        if (type.equals("DN")) {
+            transferDatas = typeLenovoDNConvertService.convertTypeLenovoDN(file);
+        } else if (type.equals("DEL")) {
+            transferDatas = typeLenovoDELConvertService.convertTypeLenovoDEL(file);
         }
         return transferDatas;
     }
