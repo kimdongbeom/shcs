@@ -62,17 +62,18 @@ public class MainPdfToExcelLenovoDN {
                         for (Lenovo data : resultDataList) {
                             if (data.getInvoiceTotalAmount() == null) {
                                 data.setInvoiceTotalAmount(totalValueOfGoods.trim());
+                                if (data.getHtsCode() == null) {
+                                    data.setHtsCode(lines[i+1]);
+                                }
                             }
-                        }
-                        if (lenovo.getHtsCode() == null) {
-                            lenovo.setHtsCode(lines[i+1]);
                         }
                     }
 
                     if (line.contains("TOTAL GROSS WEIGHT:")) {
                         for (Lenovo data : resultDataList) {
                             if (data.getTotalGrossWeight() == null) {
-                                data.setTotalGrossWeight(lines[i+2]);
+                                String totalGrossWeight = lines[i+2].split(" ")[0];
+                                data.setTotalGrossWeight(totalGrossWeight);
                             }
                         }
                     }

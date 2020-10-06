@@ -69,7 +69,8 @@ public class TypeLenovoDNConvertService {
                     if (line.contains("TOTAL GROSS WEIGHT:")) {
                         for (Lenovo data : resultDataList) {
                             if (data.getTotalGrossWeight() == null) {
-                                data.setTotalGrossWeight(lines[i+2]);
+                                String totalGrossWeight = lines[i+2].split(" ")[0];
+                                data.setTotalGrossWeight(totalGrossWeight);
                             }
                         }
                     }

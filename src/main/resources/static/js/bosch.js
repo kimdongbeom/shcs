@@ -53,7 +53,7 @@ $(document).ready(function() {
                 var mapInput = document.createElement("input");
                 mapInput.type = "hidden";
                 mapInput.name = 'data';
-                mapInput.value = dataList[i].invoiceOrder + "," + dataList[i].invoiceNo +"," + dataList[i].materialNo + "," +dataList[i].quantity;
+                mapInput.value = dataList[i].invoiceOrder + "^" + dataList[i].invoiceNo +"^" + dataList[i].materialNo + "^" +dataList[i].quantity;
                 mapFormBosch.appendChild(mapInput);
 
             }

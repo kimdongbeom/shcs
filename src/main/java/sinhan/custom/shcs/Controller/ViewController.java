@@ -29,7 +29,7 @@ public class ViewController {
         List<PDFExtractData> dataList = new ArrayList<>();
         String excelName = fileName.split(".pdf")[0] + "_converted_excel.xls";
         for (String value : inputValues) {
-            String[] splitValue = value.split(",");
+            String[] splitValue = value.split("\\^");
             PDFExtractData pdfExtractData = new PDFExtractData(Integer.parseInt(splitValue[0]), Integer.parseInt(splitValue[1]), splitValue[2], Double.valueOf(splitValue[3]));
             dataList.add(pdfExtractData);
         }
@@ -45,7 +45,7 @@ public class ViewController {
         List<Lenovo> dataList = new ArrayList<>();
         String excelName = fileName.split(".pdf")[0] + "_converted_excel.xls";
         for (String value : inputValues) {
-            String[] splitValue = value.split(",");
+            String[] splitValue = value.split("\\^");
             Lenovo lenovo = new Lenovo(value);
             dataList.add(lenovo);
         }

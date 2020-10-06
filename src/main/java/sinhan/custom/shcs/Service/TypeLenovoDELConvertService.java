@@ -84,7 +84,7 @@ public class TypeLenovoDELConvertService {
                         String totalGross = line.split("TOTAL GROSS:")[1];
                         for (Lenovo data : resultDataList) {
                             if (data.getTotalGrossWeight() == null) {
-                                data.setTotalGrossWeight(totalGross.trim());
+                                data.setTotalGrossWeight(totalGross.split(" ")[0]);
                             }
                         }
                     }

@@ -55,9 +55,9 @@ $(document).ready(function() {
                 var mapInput = document.createElement("input");
                 mapInput.type = "hidden";
                 mapInput.name = 'data';
-                mapInput.value = dataList[i].htsCode + "," + dataList[i].productIdentification +"," + dataList[i].ctryOfOrigin + "," +dataList[i].productDescription
-                                + "," + dataList[i].quantity + "," + dataList[i].uom + "," + dataList[i].unitPrice + "," + dataList[i].amount + "," + dataList[i].invoiceNo
-                                + "," + dataList[i].invoiceTotalAmount + "," + dataList[i].totalGrossWeight;
+                mapInput.value = dataList[i].htsCode + "^" + dataList[i].productIdentification +"^" + dataList[i].ctryOfOrigin + "^" +dataList[i].productDescription
+                                + "^" + dataList[i].quantity + "^" + dataList[i].uom + "^" + dataList[i].unitPrice + "^" + dataList[i].amount + "^" + dataList[i].invoiceNo
+                                + "^" + dataList[i].invoiceTotalAmount + "^" + dataList[i].totalGrossWeight;
                 mapFormLenovo.appendChild(mapInput);
 
             }

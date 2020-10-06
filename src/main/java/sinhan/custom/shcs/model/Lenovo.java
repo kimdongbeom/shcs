@@ -19,7 +19,7 @@ public class Lenovo {
     private String totalGrossWeight;
 
     public Lenovo(String value) {
-        String[] splitValue = value.split(",");
+        String[] splitValue = value.split("\\^");
         this.htsCode = splitValue[0];
         this.productIdentification = splitValue[1];
         this.ctryOfOrigin = splitValue[2];

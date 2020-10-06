@@ -45,6 +45,9 @@ public class BoschExcelView extends AbstractXlsView {
         cell = row.createCell(5);
         cell.setCellValue("Quantity");
 
+        cell = row.createCell(6);
+        cell.setCellValue("UNIT");
+
         int dataRowStartIndex = 1;
         for (PDFExtractData data : dataList) {
             row = sheet.createRow(dataRowStartIndex);
@@ -66,6 +69,9 @@ public class BoschExcelView extends AbstractXlsView {
 
             cell = row.createCell(5);
             cell.setCellValue(data.getQuantity());
+
+            cell = row.createCell(6);
+            cell.setCellValue("PC");
 
             dataRowStartIndex ++;
         }
