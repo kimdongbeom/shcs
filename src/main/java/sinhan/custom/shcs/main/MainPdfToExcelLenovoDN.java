@@ -61,7 +61,7 @@ public class MainPdfToExcelLenovoDN {
                         String totalValueOfGoods = line.split("TOTAL VALUE OF GOODS USD ")[1];
                         for (Lenovo data : resultDataList) {
                             if (data.getInvoiceTotalAmount() == null) {
-                                data.setInvoiceTotalAmount(totalValueOfGoods.trim());
+                                data.setInvoiceTotalAmount(Double.valueOf(totalValueOfGoods.trim().replace(",", "")));
                                 if (data.getHtsCode() == null) {
                                     data.setHtsCode(lines[i+1]);
                                 }
@@ -72,8 +72,8 @@ public class MainPdfToExcelLenovoDN {
                     if (line.contains("TOTAL GROSS WEIGHT:")) {
                         for (Lenovo data : resultDataList) {
                             if (data.getTotalGrossWeight() == null) {
-                                String totalGrossWeight = lines[i+2].split(" ")[0];
-                                data.setTotalGrossWeight(totalGrossWeight);
+                                String totalGrossWeight = lines[i+2].trim().split(" ")[0].replace(",", "");
+                                data.setTotalGrossWeight(Double.valueOf(totalGrossWeight));
                             }
                         }
                     }

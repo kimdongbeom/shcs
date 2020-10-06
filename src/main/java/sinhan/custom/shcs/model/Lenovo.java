@@ -12,11 +12,11 @@ public class Lenovo {
     private String productDescription;
     private String quantity;
     private String uom;
-    private String unitPrice;
-    private String amount;
+    private Double unitPrice;
+    private Double amount;
     private String invoiceNo;
-    private String invoiceTotalAmount;
-    private String totalGrossWeight;
+    private Double invoiceTotalAmount;
+    private Double totalGrossWeight;
 
     public Lenovo(String value) {
         String[] splitValue = value.split("\\^");
@@ -26,11 +26,11 @@ public class Lenovo {
         this.productDescription = splitValue[3];
         this.quantity = splitValue[4];
         this.uom = splitValue[5];
-        this.unitPrice = splitValue[6];
-        this.amount = splitValue[7];
+        this.unitPrice = Double.valueOf(splitValue[6]);
+        this.amount = Double.valueOf(splitValue[7]);
         this.invoiceNo = splitValue[8];
-        this.invoiceTotalAmount = splitValue[9];
-        this.totalGrossWeight = splitValue[10];
+        this.invoiceTotalAmount = Double.valueOf(splitValue[9]);
+        this.totalGrossWeight = Double.valueOf(splitValue[10]);
     }
 
 
@@ -38,8 +38,8 @@ public class Lenovo {
         String[] splitDatas = line.split(" ");
         String unitProductDescription = "";
         int splitDatasLength = splitDatas.length;
-        setAmount(splitDatas[splitDatasLength - 1]);
-        setUnitPrice(splitDatas[splitDatasLength - 2]);
+        setAmount(Double.valueOf(splitDatas[splitDatasLength - 1].replace(",", "")));
+        setUnitPrice(Double.valueOf(splitDatas[splitDatasLength - 2].replace(",", "")));
         setQuantity(splitDatas[splitDatasLength - 3]);
         setUom(splitDatas[splitDatasLength - 4]);
         if (splitDatas[splitDatasLength - 5].length() == 10) {
@@ -63,8 +63,8 @@ public class Lenovo {
         String[] splitDatas = line.split(" ");
         String unitProductDescription = "";
         int splitDatasLength = splitDatas.length;
-        setAmount(splitDatas[splitDatasLength - 1]);
-        setUnitPrice(splitDatas[splitDatasLength - 2]);
+        setAmount(Double.valueOf(splitDatas[splitDatasLength - 1].replace(",", "")));
+        setUnitPrice(Double.valueOf(splitDatas[splitDatasLength - 2].replace(",", "")));
         setQuantity(splitDatas[splitDatasLength - 3]);
         setUom(splitDatas[splitDatasLength - 4]);
         setHtsCode(splitDatas[splitDatasLength - 5]);

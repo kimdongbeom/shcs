@@ -64,6 +64,7 @@ public class MainPdfToExcelLenovoDEL {
                                     String[] nextLine = lines[j].split(" ");
                                     if (nextLine.length == 7 && nextLine[0].length() == 10) {
                                         lenovo.splitLineDataDEL(lines[j]);
+                                        break;
                                     }
                                 }
                             }
@@ -77,7 +78,7 @@ public class MainPdfToExcelLenovoDEL {
                         String totalValueOfGoods = line.split("INVOICE TOTAL AMOUNT ")[1];
                         for (Lenovo data : resultDataList) {
                             if (data.getInvoiceTotalAmount() == null) {
-                                data.setInvoiceTotalAmount(totalValueOfGoods.trim());
+                                data.setInvoiceTotalAmount(Double.valueOf(totalValueOfGoods.trim().replace(",", "")));
                             }
                         }
                     }
@@ -86,7 +87,8 @@ public class MainPdfToExcelLenovoDEL {
                         String totalGross = line.split("TOTAL GROSS:")[1];
                         for (Lenovo data : resultDataList) {
                             if (data.getTotalGrossWeight() == null) {
-                                data.setTotalGrossWeight(totalGross.split(" ")[0]);
+                                String totalGrossWeight = totalGross.trim().split(" ")[0].replace(",", "");
+                                data.setTotalGrossWeight(Double.valueOf(totalGrossWeight));
                             }
                         }
                     }
