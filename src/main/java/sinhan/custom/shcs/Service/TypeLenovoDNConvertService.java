@@ -6,7 +6,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 import sinhan.custom.shcs.model.Lenovo;
-import sinhan.custom.shcs.model.PDFExtractData;
 
 import java.io.File;
 import java.util.ArrayList;
