@@ -35,33 +35,30 @@ public class LenovoExcelView extends AbstractXlsView {
         cell.setCellValue("PRODUCT IDENTIFICATION");
 
         cell = row.createCell(2);
-        cell.setCellValue("CTRY OF ORIGIN");
-
-        cell = row.createCell(3);
         cell.setCellValue("PRODUCT DESCRIPTION");
 
-        cell = row.createCell(4);
+        cell = row.createCell(3);
         cell.setCellValue("QUANTITY");
 
-        cell = row.createCell(5);
+        cell = row.createCell(4);
         cell.setCellValue("UOM");
 
-        cell = row.createCell(6);
+        cell = row.createCell(5);
         cell.setCellValue("UNIT PRICE");
 
-        cell = row.createCell(7);
+        cell = row.createCell(6);
         cell.setCellValue("AMOUNT");
 
-        cell = row.createCell(8);
+        cell = row.createCell(7);
         cell.setCellValue("I");
 
-        cell = row.createCell(9);
+        cell = row.createCell(8);
         cell.setCellValue("INVOICE NO");
 
-        cell = row.createCell(10);
+        cell = row.createCell(9);
         cell.setCellValue("INVOICE TOTAL AMOUNT");
 
-        cell = row.createCell(11);
+        cell = row.createCell(10);
         cell.setCellValue("TOTAL GROSS WEIGHT");
 
         int dataRowStartIndex = 1;
@@ -72,36 +69,33 @@ public class LenovoExcelView extends AbstractXlsView {
             cell.setCellValue(data.getHtsCode());
 
             cell = row.createCell(1);
-            cell.setCellValue(data.getProductIdentification());
+            cell.setCellValue(data.getProductIdentification() + "(" + data.getCtryOfOrigin() + ")");
 
             cell = row.createCell(2);
-            cell.setCellValue(data.getCtryOfOrigin());
-
-            cell = row.createCell(3);
             cell.setCellValue(data.getProductDescription());
 
-            cell = row.createCell(4);
-            cell.setCellValue(data.getQuantity());
+            cell = row.createCell(3);
+            cell.setCellValue(Integer.parseInt(data.getQuantity()));
 
-            cell = row.createCell(5);
+            cell = row.createCell(4);
             cell.setCellValue(data.getUom());
 
-            cell = row.createCell(6);
+            cell = row.createCell(5);
             cell.setCellValue(data.getUnitPrice());
 
-            cell = row.createCell(7);
+            cell = row.createCell(6);
             cell.setCellValue(data.getAmount());
 
-            cell = row.createCell(8);
+            cell = row.createCell(7);
             cell.setCellValue("");
 
-            cell = row.createCell(9);
+            cell = row.createCell(8);
             cell.setCellValue(data.getInvoiceNo());
 
-            cell = row.createCell(10);
+            cell = row.createCell(9);
             cell.setCellValue(data.getInvoiceTotalAmount());
 
-            cell = row.createCell(11);
+            cell = row.createCell(10);
             cell.setCellValue(data.getTotalGrossWeight());
 
             dataRowStartIndex ++;

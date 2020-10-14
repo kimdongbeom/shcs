@@ -29,6 +29,9 @@ public class TypeLenovoDELConvertService {
             String[] lines = pages.split("\r\n|\r|\n");
 
             boolean isTargetBlock = false;
+            boolean isSameBlock = true;
+            boolean isChangedPage = false;
+            String productIdentification = "";
             List<Lenovo> resultDataList = new ArrayList<>();
             Lenovo lenovo = new Lenovo();
             String invoiceNo = "";
@@ -42,30 +45,57 @@ public class TypeLenovoDELConvertService {
 
                 if (line.startsWith("DEL NO. DESCRIPTION")) {
                     isTargetBlock = true;
+                    isSameBlock = true;
                 }
 
                 if (line.contains("Remarks:")) {
                     isTargetBlock = false;
                 }
 
+                if (line.contains("INVOICE TOTAL AMOUNT")) {
+                    isSameBlock = false;
+                }
+
                 if (isTargetBlock) {
 
                     if (line.startsWith("(00)SSCC#")) {
                         String[] splitLine = line.split(" ");
+
                         if (splitLine.length == 3 && splitLine[2].length() == 18) {
-                            lenovo.setProductDescription(lines[i+1].trim());
+
+                            productIdentification = lines[i+1].trim();
                             String[] next2LineWords = lines[i+2].split(" ");
-                            if (next2LineWords.length == 7 && next2LineWords[0].length() == 10) {
+
+                            if (next2LineWords.length == 7) {
+                                lenovo.setProductDescription(lines[i+1].trim());
                                 lenovo.splitLineDataDEL(lines[i+2]);
                             } else {
+                                isChangedPage = true;
                                 for (int j=i+2; j < lines.length; j++) {
                                     String[] nextLine = lines[j].split(" ");
-                                    if (nextLine.length == 7 && nextLine[0].length() == 10) {
+                                    if (nextLine.length == 7) {
                                         lenovo.splitLineDataDEL(lines[j]);
+                                        if (isSameBlock) {
+                                            // 페이지가 바뀌는 부분이라서 이전 데이터의 description과 동일하기 떄문에 동일한 값을 넣어준다.
+                                            if (isChangedPage) {
+                                                if (productIdentification.contains("LENOVO KOREA LLC")) {
+                                                    lenovo.setProductDescription(lines[j-1].trim());
+                                                } else {
+                                                    lenovo.setProductDescription(productIdentification);
+                                                    isChangedPage = false;
+                                                }
+                                            } else {
+                                                int listSize = resultDataList.size() - 1;
+                                                lenovo.setProductDescription(resultDataList.get(listSize).getProductDescription());
+                                            }
+                                        } else {
+                                            lenovo.setProductDescription(lines[j+3].trim());
+                                        }
                                         break;
                                     }
                                 }
                             }
+
                             lenovo.setInvoiceNo(invoiceNo);
                             resultDataList.add(lenovo);
                             lenovo = new Lenovo();
