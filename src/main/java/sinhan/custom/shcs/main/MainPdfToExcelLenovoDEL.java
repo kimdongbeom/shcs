@@ -21,7 +21,8 @@ public class MainPdfToExcelLenovoDEL {
 
         try {
 //            File file = new File("/Users/nhnent/Desktop/shcs/lenova/ZHINC5502404_IV.PDF");
-            File file = new File("/Users/nhnent/Desktop/shcs/lenova/CI-RORO-COHEAH667EC507.pdf");
+            File file = new File("/Users/nhnent/Desktop/shcs/2차작업/확인/3.pdf");
+//            File file = new File("/Users/nhnent/Desktop/shcs/lenova/CI-RORO-COHEAH667EC507.pdf");
             PDDocument document = PDDocument.load(file);
             PDFTextStripper pdfStripper = new PDFTextStripper();
 

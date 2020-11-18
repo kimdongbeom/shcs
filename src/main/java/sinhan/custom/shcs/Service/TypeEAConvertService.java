@@ -78,7 +78,7 @@ public class TypeEAConvertService {
                             String targetForEA = line.split("EA")[0];
                             String[] splitTargetForEA = targetForEA.split(" ");
                             if (StringUtils.isNumeric(splitTargetForEA[0])) {
-                                EA = splitTargetForEA[splitTargetForEA.length - 1];
+                                EA = splitTargetForEA[splitTargetForEA.length - 1].replaceAll("\\.", "");
 
                                 if (StringUtils.isNumeric(EA)) {
                                     for (String target : splitTargetForMaterialNo) {
@@ -100,7 +100,7 @@ public class TypeEAConvertService {
                             String targetForEA = line.split("EA")[1].split("EA")[0];
                             String[] splitTargetForEA = targetForEA.split(" ");
                             if (splitTargetForEA[0].startsWith("F")) {
-                                EA = splitTargetForEA[splitTargetForEA.length - 1];
+                                EA = splitTargetForEA[splitTargetForEA.length - 1].replaceAll("\\.", "");
 
                                 if (StringUtils.isNumeric(EA)) {
                                     for (String target : splitTargetForMaterialNo) {
@@ -124,7 +124,7 @@ public class TypeEAConvertService {
                         String targetForEA = line.split("SET")[0];
                         String[] splitTargetForEA = targetForEA.split(" ");
                         if (StringUtils.isNumeric(splitTargetForEA[0])) {
-                            EA = splitTargetForEA[splitTargetForEA.length - 1];
+                            EA = splitTargetForEA[splitTargetForEA.length - 1].replaceAll("\\.", "");
 
                             if (StringUtils.isNumeric(EA)) {
                                 for (String target : splitTargetForMaterialNo) {

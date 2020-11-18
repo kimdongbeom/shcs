@@ -88,7 +88,7 @@ public class MainPdfToExcelTypeEa {
                             if (eaCount == 1) {
                                 String targetForEA = line.split("EA")[0];
                                 String[] splitTargetForEA = targetForEA.split(" ");
-                                if (StringUtils.isNumeric(splitTargetForEA[0])) {
+                                if (StringUtils.isNumeric(splitTargetForEA[0].replace("\\.", ""))) {
                                     setExcelData(line, invoiceNo, dataList, splitTargetForMaterialNo, splitTargetForEA);
                                 }
                             } else {
@@ -104,7 +104,7 @@ public class MainPdfToExcelTypeEa {
                             String[] splitTargetForMaterialNo = line.split(" ");
                             String targetForEA = line.split("SET")[0];
                             String[] splitTargetForEA = targetForEA.split(" ");
-                            if (StringUtils.isNumeric(splitTargetForEA[0])) {
+                            if (StringUtils.isNumeric(splitTargetForEA[0].replace("\\.", ""))) {
                                 setExcelData(line, invoiceNo, dataList, splitTargetForMaterialNo, splitTargetForEA);
                             }
                         }
