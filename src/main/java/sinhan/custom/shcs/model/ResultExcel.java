@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ResultExcel {
-    private String voiceNo;
+    private String invoiceNo;
     private String productCode;
     private String productName1;
     private String productName2;
@@ -44,6 +44,8 @@ public class ResultExcel {
             this.unit = "PC";
         } else if (unit.equals("RILL")) {
             this.unit = "RL";
+        } else {
+            this.unit = unit;
         }
     }
 

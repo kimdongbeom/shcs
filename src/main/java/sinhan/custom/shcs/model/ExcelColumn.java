@@ -1,10 +1,12 @@
 package sinhan.custom.shcs.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class ExcelColumn {
     private String column1;
     private String column2;
@@ -32,7 +34,12 @@ public class ExcelColumn {
     private String column24;
     private String column25;
     private String column26;
-    private String column27;
+    private String column27; //pdf name
+    private String column28; //invoiceNo
+
+    public ExcelColumn(String invoiceNo) {
+        this.column28 = invoiceNo;
+    }
 
     public void setColumn(int columnNumber, String id, String columnValue) {
         columnNumber = columnNumber + 1;

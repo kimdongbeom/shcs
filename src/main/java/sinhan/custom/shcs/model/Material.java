@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Material {
+    private String invoiceNo;
     private String materialId; //pdf를 찾는 수단이 된다.
     private int bales;
     private int roll;

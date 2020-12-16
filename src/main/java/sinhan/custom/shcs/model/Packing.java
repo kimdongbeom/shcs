@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Packing {
+    private String invoiceNo;
     private String packingId;
     private String name;
     private String hsCode;

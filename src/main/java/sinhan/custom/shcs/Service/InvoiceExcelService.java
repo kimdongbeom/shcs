@@ -1,33 +1,37 @@
-package sinhan.custom.shcs.main;
+package sinhan.custom.shcs.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import sinhan.custom.shcs.model.ExcelColumn;
 import sinhan.custom.shcs.model.Material;
 import sinhan.custom.shcs.model.Packing;
 import sinhan.custom.shcs.model.ResultExcel;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
-public class MainReadExcel {
+@Slf4j
+@Service
+public class InvoiceExcelService {
 
-    private static final String pdfFileFolder = "/Users/nhnent/Desktop/shcs/work2/pdf/";
+    @Value("${da.pdf.upload.dir}")
+    private String daPdfUploadDir;
 
-    public static void main(String[] args) {
-        // 웹상에서 업로드 되어 MultipartFile인 경우 바로 InputStream으로 변경하여 사용.
-        // InputStream inputStream = new ByteArrayInputStream(file.getBytes());
-        //
-        // String filePath = "D:\\student.xlsx"; // xlsx 형식
-        String filePath = "/Users/nhnent/Desktop/shcs/work2/thiswork/HSVSS-201126.4-1.xls"; // xls 형식
-         // 엑셀 로드
+    public List<ResultExcel> convertExcelToResultModel(MultipartFile multipartFile) {
+        List<ResultExcel> resultExcelList = new ArrayList<>();
+        String invoiceNo = "";
         try {
-            InputStream inputStream = new FileInputStream(filePath);
+            invoiceNo = multipartFile.getOriginalFilename();
+            File file = new File(invoiceNo);
+
+//            InputStream inputStream = new FileInputStream(file);
+            InputStream inputStream = new ByteArrayInputStream(multipartFile.getBytes());
             Workbook workbook = WorkbookFactory.create(inputStream);
 
             Sheet sheet = workbook.getSheetAt(0);
@@ -39,6 +43,7 @@ public class MainReadExcel {
             int rowCount = sheet.getPhysicalNumberOfRows();
             int colCount = sheet.getRow(3).getPhysicalNumberOfCells();
 
+            invoiceNo = invoiceNo.replace(".xls", "").replace(".", "/");
             List<ExcelColumn> materialList = new ArrayList<>();
             List<ExcelColumn> packingList = new ArrayList<>();
 
@@ -52,7 +57,6 @@ public class MainReadExcel {
 
                     String cellValue = formatter.formatCellValue(currentCell);
                     if (StringUtils.isNotBlank(cellValue)) {
-//                        System.out.println(cellValue);
                         if (cellValue.contains("MATERIAL FOR KNITTED")) {
                             System.out.println(cellValue);
                             isMatrialRange = true;
@@ -70,7 +74,7 @@ public class MainReadExcel {
                                 materialId = cellValue.replace("(", "").replace(")", "");
 
                                 for (int y = i + 1; y < rowCount; y++) {
-                                    ExcelColumn excelColumn = new ExcelColumn();
+                                    ExcelColumn excelColumn = new ExcelColumn(invoiceNo);
                                     for (int z = 0; z < colCount; z++) {
                                         Cell materialCell = sheet.getRow(y).getCell(z);
                                         String materialValue = formatter.formatCellValue(materialCell);
@@ -97,7 +101,7 @@ public class MainReadExcel {
                             if (cellValue.startsWith("(") && cellValue.endsWith(")")) {
                                 packingId = cellValue.replace("(", "").replace(")", "");
                                 for (int y = i + 1; y < rowCount; y++) {
-                                    ExcelColumn excelColumn = new ExcelColumn();
+                                    ExcelColumn excelColumn = new ExcelColumn(invoiceNo);
                                     for (int z = 0; z < colCount; z++) {
                                         Cell materialCell = sheet.getRow(y).getCell(z);
                                         String materialValue = formatter.formatCellValue(materialCell);
@@ -120,13 +124,8 @@ public class MainReadExcel {
                                             packingList.add(excelColumn);
                                         }
                                     }
-//
-//                                    if (cellValue.contains("TOTAL MEASUREMENT")) {
-//                                        break breakOut;
-//                                    }
                                 }
                             }
-
                         }
                     }
                 }
@@ -136,7 +135,7 @@ public class MainReadExcel {
             List<Material> targetMaterialList = makeMaterialModel(materialList);
             List<Packing> targetPackingList = makePackingModel(packingList);
 
-            List<ResultExcel> resultExcelList = findMatchedPdfAndMakeData(targetMaterialList);
+            resultExcelList = findMatchedPdfAndMakeData(targetMaterialList, targetPackingList);
             /*
                 todo
                 1. 만들어진 materialList와 packingList를 하나의 모델값으로 변경
@@ -152,9 +151,10 @@ public class MainReadExcel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return resultExcelList;
     }
 
-    private static List<Material> makeMaterialModel(List<ExcelColumn> excelColumnMaterialList) {
+    private List<Material> makeMaterialModel(List<ExcelColumn> excelColumnMaterialList) {
         // 2개 라인을 읽어서 1개의 Material으로 작업
 
         List<Material> materials = new ArrayList<>();
@@ -166,6 +166,7 @@ public class MainReadExcel {
                 ExcelColumn data1 = excelColumnMaterialList.get(i);
                 ExcelColumn data2 = excelColumnMaterialList.get(i + 1);
 
+                material.setInvoiceNo(data1.getColumn28());
                 material.setFabric(data1.getColumn7());
                 material.setMaterialId(data1.getColumn27());
                 material.setBalesOrRoll(data1.getColumn3(), data1.getColumn4());
@@ -187,7 +188,7 @@ public class MainReadExcel {
         return materials;
     }
 
-    private static List<Packing> makePackingModel(List<ExcelColumn> excelColumnPackingList) {
+    private List<Packing> makePackingModel(List<ExcelColumn> excelColumnPackingList) {
         // 2개 라인을 읽어서 1개의 Packing으로 작업
         System.out.println(excelColumnPackingList.size());
 
@@ -200,6 +201,7 @@ public class MainReadExcel {
                 ExcelColumn data1 = excelColumnPackingList.get(i);
                 ExcelColumn data2 = excelColumnPackingList.get(i + 1);
 
+                packing.setInvoiceNo(data1.getColumn28());
                 packing.setPackingId(data1.getColumn27());
                 packing.setName(data1.getColumn7());
                 packing.setHsCode(data2.getColumn12());
@@ -214,9 +216,10 @@ public class MainReadExcel {
         return packings;
     }
 
-    private static List<ResultExcel> findMatchedPdfAndMakeData(List<Material> materialList) {
+    private List<ResultExcel> findMatchedPdfAndMakeData(List<Material> materialList, List<Packing> packingList) {
         // 원단 파일을 넘겨받아 PDF에서 해당 매칭 데이터를 찾아 긁어오기
 
+        List<ResultExcel> resultExcels = new ArrayList<>();
         Set<String> materialIds = new HashSet<>();
         for (Material material : materialList) {
             materialIds.add(material.getMaterialId());
@@ -226,25 +229,54 @@ public class MainReadExcel {
 
         while (iterator.hasNext()) {
             String materialId = iterator.next();
-            String pdfFilePath = pdfFileFolder + materialId + ".pdf";
+            String pdfFilePath = daPdfUploadDir + materialId + ".pdf";
+            String invoiceNo = "";
+            for (Material material : materialList) {
+                if (materialId.equals(material.getMaterialId())) {
+                    invoiceNo = material.getInvoiceNo();
+                }
+            }
 
             String[] lines = readPdf(pdfFilePath);
-            makeReultData(materialId, lines, materialList);
+            log.info("materialId : {}, pdfName : {}, pdfLineCount : {} ", invoiceNo, materialId, lines.length);
+            resultExcels.addAll(makeMaterialResultData(materialId, lines, materialList));
             System.out.println(lines.length);
         }
-        /**
-         * find pdf
-         * pdf에서 매칭되는 데이터 가져오기
-         * 데이터 가져와서 엑셀로 만들기 (자재, 부자재)
-         *
-         */
-        //
-        return null;
+
+        resultExcels.addAll(makePackingResultData(packingList));
+        return resultExcels;
     }
 
-    private static void makeReultData(String materialId, String[] lines, List<Material> materialList) {
+    private List<ResultExcel> makePackingResultData(List<Packing> packingList) {
+        List<ResultExcel> resultPackingExcelList = new ArrayList<>();
+        for (Packing packing : packingList) {
+            ResultExcel result = new ResultExcel();
+
+            result.setInvoiceNo(packing.getInvoiceNo());
+            result.setProductCode("");
+            result.setProductName1("(" + packing.getPackingId() + ")");
+            result.setProductName2(packing.getName()); // WIDTH, WEIGHT
+            result.setProductName3("");
+            result.setFabric("");
+            result.setFiberContent1("(" + packing.getPackingId() + ")");
+            result.setFiberContent2(packing.getName());
+            result.setFiberContent3("");
+            result.setCount(packing.getQuantity());
+            result.setUnit(packing.getUnit());
+            result.setUnitPrice(packing.getUnitPrice());
+            result.setTotalPrice(packing.getTotalPrice());
+            result.setOrigin("KR");
+            result.setPackageUnit("GT");
+
+            resultPackingExcelList.add(result);
+        }
+
+        return resultPackingExcelList;
+    }
+
+    private List<ResultExcel> makeMaterialResultData(String materialId, String[] lines, List<Material> materialList) {
         List<String> targetData = new ArrayList<>();
-        List<ResultExcel> resultDataList = new ArrayList<>();
+        List<ResultExcel> resultMaterialExcelList = new ArrayList<>();
         for (Material material : materialList) {
             boolean isTargetBlock = false;
             if (materialId.equals(material.getMaterialId())) {
@@ -270,17 +302,13 @@ public class MainReadExcel {
                 }
             }
 
-            // handle data
-            System.out.println(targetData.size());
-            resultDataList.add(convertResultDataList(material, targetData));
-            /**
-             * todo
-             * resultDataList와 packingList가지고 최종 엑셀 만들기
-             */
+            resultMaterialExcelList.add(mappingMaterialAndPdfData(material, targetData));
         }
+
+        return resultMaterialExcelList;
     }
 
-    private static ResultExcel convertResultDataList(Material material, List<String> targetData) {
+    private ResultExcel mappingMaterialAndPdfData(Material material, List<String> targetData) {
         ResultExcel result = new ResultExcel();
 
         StringBuilder strBuilder = new StringBuilder();
@@ -311,7 +339,7 @@ public class MainReadExcel {
             }
         }
 
-        result.setInvoiceNo("");
+        result.setInvoiceNo(material.getInvoiceNo());
         result.setProductCode(material.getMaterialId() + material.getUnitPrice());
         result.setProductName1("(" + material.getMaterialId() + ") KNITTED FABRIC");
         result.setProductName2(targetData.get(4) + " " + targetData.get(5)); // WIDTH, WEIGHT
@@ -348,5 +376,4 @@ public class MainReadExcel {
 
         return pages.split("\r\n|\r|\n");
     }
-
 }
