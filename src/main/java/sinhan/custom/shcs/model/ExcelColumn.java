@@ -8,7 +8,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ExcelColumn {
-    private String column1;
+    private String column0;  // packingList의 첫 객체에만 Total Net Weight값이 들어간다.
+    private String column1;  // material의 경우에는 C'T NO 값으로 사용,
     private String column2;
     private String column3;
     private String column4;
@@ -39,6 +40,14 @@ public class ExcelColumn {
 
     public ExcelColumn(String invoiceNo) {
         this.column28 = invoiceNo;
+    }
+
+    public void setColumn1(String ctNo) {
+        if (ctNo.contains("-")) {
+            this.column1 = ctNo.split("-")[1];
+        } else {
+            this.column1 = ctNo;
+        }
     }
 
     public void setColumn(int columnNumber, String id, String columnValue) {

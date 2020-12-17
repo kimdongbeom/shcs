@@ -21,6 +21,7 @@ public class Material {
     private double unitPrice;  // 단가
     private double totalPrice;
     private boolean isLastSameMaterial = false;
+    private int ctNo; //packinglist의 포장수량을 구하기 위함 (ctNo + roll)
 
     public void setIsLastSameMaterial(boolean flag) {
         this.isLastSameMaterial = flag;

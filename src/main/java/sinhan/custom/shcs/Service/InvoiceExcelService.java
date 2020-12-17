@@ -46,6 +46,7 @@ public class InvoiceExcelService {
             invoiceNo = invoiceNo.replace(".xls", "").replace(".", "/");
             List<ExcelColumn> materialList = new ArrayList<>();
             List<ExcelColumn> packingList = new ArrayList<>();
+            String ctNo = "";
 
             breakOut:
             for (int i = 0; i < rowCount; i++) {
@@ -58,18 +59,26 @@ public class InvoiceExcelService {
                     String cellValue = formatter.formatCellValue(currentCell);
                     if (StringUtils.isNotBlank(cellValue)) {
                         if (cellValue.contains("MATERIAL FOR KNITTED")) {
-                            System.out.println(cellValue);
                             isMatrialRange = true;
                         } else if (cellValue.contains("PACKING ACC")) {
                             isMatrialRange = false;
                             isPackingRange = true;
+                        } else if (cellValue.contains("TOTAL NET WEIGHT")) {
+                            Cell cell = sheet.getRow(i).getCell(j+3);
+                            packingList.get(0).setColumn0(formatter.formatCellValue(cell));
                         } else if (cellValue.contains("PACKING LIST")) {
                             break breakOut;
                         }
 
                         materialBreakOut:
                         if (isMatrialRange) {
+                            String nextRow = formatter.formatCellValue(sheet.getRow(i + 1).getCell(1));
                             String materialId = "";
+
+                            if (nextRow.startsWith("C'T")) {
+                                ctNo = nextRow.split(" : ")[1];
+                            }
+
                             if (cellValue.startsWith("(") && cellValue.endsWith(")")) {
                                 materialId = cellValue.replace("(", "").replace(")", "");
 
@@ -100,6 +109,7 @@ public class InvoiceExcelService {
 
                             if (cellValue.startsWith("(") && cellValue.endsWith(")")) {
                                 packingId = cellValue.replace("(", "").replace(")", "");
+                                packingBreak:
                                 for (int y = i + 1; y < rowCount; y++) {
                                     ExcelColumn excelColumn = new ExcelColumn(invoiceNo);
                                     for (int z = 0; z < colCount; z++) {
@@ -114,7 +124,8 @@ public class InvoiceExcelService {
                                     }
 
                                     if (StringUtils.isBlank(excelColumn.getColumn6()) && StringUtils.isBlank(excelColumn.getColumn7()) && StringUtils.isBlank(excelColumn.getColumn12())) {
-                                        break breakOut;
+                                        isPackingRange = false;
+                                        break packingBreak;
                                     } else if (StringUtils.isBlank(excelColumn.getColumn7()) && StringUtils.isBlank(excelColumn.getColumn12())) {
                                         continue;
                                     } else {
@@ -131,11 +142,13 @@ public class InvoiceExcelService {
                 }
             }
 
+            materialList.get(0).setColumn1(ctNo);  //packingList 포장수량을 위한 값
 
             List<Material> targetMaterialList = makeMaterialModel(materialList);
             List<Packing> targetPackingList = makePackingModel(packingList);
 
             resultExcelList = findMatchedPdfAndMakeData(targetMaterialList, targetPackingList);
+
             /*
                 todo
                 1. 만들어진 materialList와 packingList를 하나의 모델값으로 변경
@@ -185,6 +198,12 @@ public class InvoiceExcelService {
             }
         }
 
+        if (materials.get(1) != null) {
+            materials.get(0).setCtNo(Integer.parseInt(excelColumnMaterialList.get(0).getColumn1()) + materials.get(0).getRoll() + materials.get(1).getRoll());
+        } else {
+            materials.get(0).setCtNo(Integer.parseInt(excelColumnMaterialList.get(0).getColumn1()) + materials.get(0).getRoll());
+        }
+
         return materials;
     }
 
@@ -213,6 +232,7 @@ public class InvoiceExcelService {
                 packings.add(packing);
             }
         }
+        packings.get(0).setUnitPrice(excelColumnPackingList.get(0).getColumn0());
         return packings;
     }
 
@@ -243,11 +263,14 @@ public class InvoiceExcelService {
             System.out.println(lines.length);
         }
 
-        resultExcels.addAll(makePackingResultData(packingList));
+        double materialUnitPriceSum = resultExcels.stream().map(x -> x.getCalculateWeight()).reduce(0.0, (a,b) -> a + b);
+
+        resultExcels.addAll(makePackingResultData(packingList, materialList, materialUnitPriceSum));
+
         return resultExcels;
     }
 
-    private List<ResultExcel> makePackingResultData(List<Packing> packingList) {
+    private List<ResultExcel> makePackingResultData(List<Packing> packingList, List<Material> materialList, double materialUnitPriceSum) {
         List<ResultExcel> resultPackingExcelList = new ArrayList<>();
         for (Packing packing : packingList) {
             ResultExcel result = new ResultExcel();
@@ -270,6 +293,9 @@ public class InvoiceExcelService {
 
             resultPackingExcelList.add(result);
         }
+
+        resultPackingExcelList.get(0).setCalculateWeight(packingList.get(0).getUnitPrice() - materialUnitPriceSum);
+        resultPackingExcelList.get(0).setPackageCount(materialList.get(0).getCtNo());
 
         return resultPackingExcelList;
     }
@@ -355,7 +381,7 @@ public class InvoiceExcelService {
         result.setHsCode(targetData.get(0).split(" BODY")[0].replace(".", ""));
         result.setPackageUnit("BL");
         result.setPackageCount(material.getBales());
-//        result.setCompanyName(); //todo 추후 셋팅
+        result.setCompanyName(targetData.get(1) + targetData.get(2) + targetData.get(3));
 
         return result;
     }
