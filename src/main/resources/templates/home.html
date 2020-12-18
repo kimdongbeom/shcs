@@ -55,24 +55,33 @@
             <h3>INVOICE, DA 관리 및 엑셀처리 작업</h3>
             <p class="lead"><h5>엑셀 업로드 전 해당 원단의 PDF가 있는지 확인해주세요.</h5></p>
             <div>
-                <form id="daPdfUploadForm" method="POST" enctype="multipart/form-data">
-                    <input id="uploadDaPdf" name="file" type="file" accept="application/pdf"/>
-                    <button id="btnSubmitPdf">업로드</button>
+                <p class="lead"><h5>DA(PDF) 업로드</h5></p>
+                <form id="daPdfUploadForm" method="POST" enctype="multipart/form-data" style="margin-top:5px;">
+                    <input id="uploadDaPdf" name="file" type="file" accept="application/pdf" style="float:left;"/>
+                    <button id="btnSubmitPdf" class="btn btn-primary btn-xs">선택된 파일 업로드</button>
                 </form>
             </div>
-            <div>
-                <input id="searchPdf"/>
-                <button id="searchPdfBtn" class="btn btn-primary">검색</button>
-                <div id="fileList">
-                    <tr th:each="file: ${fileNames}">
-                        <td th:text="${file}"></td>
-                    </tr>
+            <hr style="width:100%;">
+            <div style="margin-top: 20px;">
+                <span style="font-size:18px;color:red;margin-right:50px;">UPLOAD된 PDF 리스트</span>
+                <div style="float:right;display:contents">
+                    <input id="searchPdf" style="margin-top: 10px;width:250px;height:29px;"/>
+                    <button id="searchPdfBtn" class="btn btn-danger btn-sm" style="margin-bottom:5px;">검색</button>
                 </div>
             </div>
+            <div id="fileList" style="border: 1.2px solid black;height:300px;overflow:auto;">
+                <span th:each="file : ${fileNames}">
+                    <span th:text="${file}" style="margin-right: 15px;" th:onclick="fileDelete([[${file}]]);"></span>
+                </span>
+            </div>
+            <hr style="width:100%;">
             <div>
-                <form id="excelUploadForm" target="_blank" action="/convert/excel" method="POST" enctype="multipart/form-data">
+                <p class="lead"><h4>INVOICE(EXCEL)업로드 변환</h4></p>
+                <p>* INVOICE(EXCEL) 내부 원단과 부자재 사이에 이미지가 있는지 확인해주세요</p>
+                <p>* INVOICE(EXCEL) 내부 DA와 매칭되는 INVOICE가 업로드 되어 있지 않은 경우 정상 추출되지 않습니다.</p>
+                <form id="excelUploadForm" target="_blank" action="/convert/excel" method="POST" enctype="multipart/form-data" style="margin-top:5px;">
                     <input id="uploadExcel" name="file" type="file" accept="application/vnd.ms-excel"/>
-                    <input id="btnSubmitUploadExcel" type="submit">엑셀변환</input>
+                    <input id="btnSubmitUploadExcel" type="submit" class="btn btn-primary" value="변환시작" style="margin-top:5px;"/>
                 </form>
             </div>
         </div>
@@ -87,6 +96,27 @@
     /*<![CDATA[*/
     var testValue = [[${fileNames}]];
     /*]]>*/
+
+    function fileDelete(fileName) {
+        var deleteFlag = confirm(fileName + "을 삭제하시겠습니까?");
+
+        if (deleteFlag) {
+            $.ajax({
+                type: 'GET',
+                enctype: 'multipart/form-data',
+                url: '/delete/pdf?file=' + fileName,
+                processData: false,
+                contentType: false,
+                cache: false,
+            }).done(function(fragment) {
+                $("#fileList").replaceWith(fragment);
+                alert("삭제되었습니다.")
+            });;
+        } else {
+            console.log("no")
+        }
+
+    }
 </script>
 </body>
 <script>
