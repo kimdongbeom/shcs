@@ -15,6 +15,8 @@ import sinhan.custom.shcs.model.ResultExcel;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -301,10 +303,10 @@ public class InvoiceExcelService {
     }
 
     private List<ResultExcel> makeMaterialResultData(String materialId, String[] lines, List<Material> materialList) {
-        List<String> targetData = new ArrayList<>();
         List<ResultExcel> resultMaterialExcelList = new ArrayList<>();
         for (Material material : materialList) {
             boolean isTargetBlock = false;
+            List<String> targetData = new ArrayList<>();
             if (materialId.equals(material.getMaterialId())) {
                 breakThisMaterial:
                 for (int i = 0; i < lines.length; i++) {
@@ -338,7 +340,7 @@ public class InvoiceExcelService {
         ResultExcel result = new ResultExcel();
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("BODY" + targetData.get(0).split("BODY  ")[1]);
+        strBuilder.append("BODY" + targetData.get(0).split(" : ")[1]);
         double weight = 0.0;
         boolean isTargetContent = false;
         for (String line : targetData) {
@@ -348,7 +350,11 @@ public class InvoiceExcelService {
             }
 
             if (line.startsWith("WEIGHT : ")) {
-                weight = Double.parseDouble(line.split("WEIGHT : ")[1].split(" ")[0]);
+                String tempWeight = line.split("WEIGHT : ")[1].split(" ")[0];
+                IntStream stream = tempWeight.chars();
+                weight = Double.parseDouble(stream.filter((ch) -> (48 <= ch && ch <= 57) || (ch == 46)).mapToObj(ch -> (char)ch)
+                        .map(Object::toString)
+                        .collect(Collectors.joining()));
                 strBuilder.append(appendLine);
             }
 
@@ -378,7 +384,11 @@ public class InvoiceExcelService {
         result.setTotalPrice(material.getTotalPrice());
         result.setOrigin("KR");
         result.setCalculateWeight((material.getQuantity() * weight) / 1000);
-        result.setHsCode(targetData.get(0).split(" BODY")[0].replace(".", ""));
+        if (targetData.get(0).contains("BODY")) {
+            result.setHsCode(targetData.get(0).split(" BODY")[0].replace(".", ""));
+        } else if (targetData.get(0).contains("TRIM")) {
+            result.setHsCode(targetData.get(0).split(" TRIM")[0].replace(".", ""));
+        }
         result.setPackageUnit("BL");
         result.setPackageCount(material.getBales());
         result.setCompanyName(targetData.get(1) + targetData.get(2) + targetData.get(3));

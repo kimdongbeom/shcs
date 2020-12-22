@@ -1,10 +1,8 @@
 package sinhan.custom.shcs.ExcelView;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.document.AbstractXlsView;
 import sinhan.custom.shcs.model.ResultExcel;
@@ -139,80 +137,256 @@ public class InvoiceExcelView extends AbstractXlsView {
          * 컨텐츠 내용이 3개이상 있을 경우 어떻게 처리할지 고민
          */
         int dataRowStartIndex = 1;
+        DecimalFormat form = new DecimalFormat("#.##");
         for (ResultExcel data : dataList) {
-            row = sheet.createRow(dataRowStartIndex);
+            if (StringUtils.isNotBlank(data.getFiberContent4()) && StringUtils.isNotBlank(data.getFiberContent7())) {
+                // set 9
+                dataRowStartIndex = setFirstRow(sheet, dataRowStartIndex, form, data);
 
-            cell = row.createCell(0);
-            cell.setCellValue(data.getInvoiceNo());
+                dataRowStartIndex = setSecondLine(sheet, dataRowStartIndex, data, data.getFiberContent4(), data.getFiberContent5(), data.getFiberContent6());
 
-            cell = row.createCell(1);
-            cell.setCellValue(data.getProductCode());
+                dataRowStartIndex = setThirdLine(sheet, dataRowStartIndex, data, data.getFiberContent7(), data.getFiberContent8(), data.getFiberContent9());
+            } else if (StringUtils.isNotBlank(data.getFiberContent4())) {
+                dataRowStartIndex = setFirstRow(sheet, dataRowStartIndex, form, data);
 
-            cell = row.createCell(2);
-            cell.setCellValue(data.getProductName1());
-
-            cell = row.createCell(3);
-            cell.setCellValue(data.getProductName2());
-
-            cell = row.createCell(4);
-            cell.setCellValue(data.getProductName3());
-
-            cell = row.createCell(5);
-            cell.setCellValue(data.getFabric());
-
-            cell = row.createCell(6);
-            cell.setCellValue(data.getFiberContent1());
-
-            cell = row.createCell(7);
-            cell.setCellValue(data.getFiberContent2());
-
-            cell = row.createCell(8);
-            cell.setCellValue(data.getFiberContent3());
-
-            cell = row.createCell(9);
-            cell.setCellValue("");
-
-            cell = row.createCell(10);
-            cell.setCellValue(data.getCount());
-
-            cell = row.createCell(11);
-            cell.setCellValue(data.getUnit());
-
-            cell = row.createCell(12);
-            cell.setCellValue(data.getUnitPrice());
-
-            cell = row.createCell(13);
-            cell.setCellValue(data.getTotalPrice());
-
-            cell = row.createCell(14);
-            cell.setCellValue(data.getOrigin());
-
-            cell = row.createCell(15);
-            DecimalFormat form = new DecimalFormat("#.##");
-            cell.setCellValue(form.format(data.getCalculateWeight()));
-
-            cell = row.createCell(16);
-            cell.setCellValue(data.getHsCode());
-
-            cell = row.createCell(17);
-            cell.setCellValue(data.getPackageUnit());
-
-            cell = row.createCell(18);
-            cell.setCellValue(data.getPackageCount());
-
-            cell = row.createCell(19);
-            cell.setCellValue("NO");
-
-            cell = row.createCell(20);
-            cell.setCellValue("");
-
-            cell = row.createCell(21);
-            cell.setCellValue("B");
-
-            cell = row.createCell(22);
-            cell.setCellValue(data.getCompanyName());
-
-            dataRowStartIndex++;
+                dataRowStartIndex = setSecondLine(sheet, dataRowStartIndex, data, data.getFiberContent4(), data.getFiberContent5(), data.getFiberContent6());
+            } else {
+                dataRowStartIndex = setFirstRow(sheet, dataRowStartIndex, form, data);
+            }
         }
+    }
+
+    private int setThirdLine(Sheet sheet, int dataRowStartIndex, ResultExcel data, String fiberContent7, String fiberContent8, String fiberContent9) {
+        Row row;
+        Cell cell;
+        row = sheet.createRow(dataRowStartIndex);
+
+        cell = row.createCell(0);
+        cell.setCellValue(data.getInvoiceNo());
+
+        cell = row.createCell(1);
+        cell.setCellValue("");
+
+        cell = row.createCell(2);
+        cell.setCellValue("");
+
+        cell = row.createCell(3);
+        cell.setCellValue("");
+
+        cell = row.createCell(4);
+        cell.setCellValue("");
+
+        cell = row.createCell(5);
+        cell.setCellValue("");
+
+        cell = row.createCell(6);
+        cell.setCellValue(fiberContent7);
+
+        cell = row.createCell(7);
+        cell.setCellValue(fiberContent8);
+
+        cell = row.createCell(8);
+        cell.setCellValue(fiberContent9);
+
+        cell = row.createCell(9);
+        cell.setCellValue("");
+
+        cell = row.createCell(10);
+        cell.setCellValue("");
+
+        cell = row.createCell(11);
+        cell.setCellValue("");
+
+        cell = row.createCell(12);
+        cell.setCellValue("");
+
+        cell = row.createCell(13);
+        cell.setCellValue("");
+
+        cell = row.createCell(14);
+        cell.setCellValue(data.getOrigin());
+
+        cell = row.createCell(15);
+        cell.setCellValue("");
+
+        cell = row.createCell(16);
+        cell.setCellValue(data.getHsCode());
+
+        cell = row.createCell(17);
+        cell.setCellValue(data.getPackageUnit());
+
+        cell = row.createCell(18);
+        cell.setCellValue("");
+
+        cell = row.createCell(19);
+        cell.setCellValue("NO");
+
+        cell = row.createCell(20);
+        cell.setCellValue("");
+
+        cell = row.createCell(21);
+        cell.setCellValue("B");
+
+        cell = row.createCell(22);
+        cell.setCellValue(data.getCompanyName());
+
+        dataRowStartIndex++;
+        return dataRowStartIndex;
+    }
+
+    private int setSecondLine(Sheet sheet, int dataRowStartIndex, ResultExcel data, String fiberContent4, String fiberContent5, String fiberContent6) {
+        Row row;
+        Cell cell;
+        row = sheet.createRow(dataRowStartIndex);
+
+        cell = row.createCell(0);
+        cell.setCellValue(data.getInvoiceNo());
+
+        cell = row.createCell(1);
+        cell.setCellValue("");
+
+        cell = row.createCell(2);
+        cell.setCellValue("");
+
+        cell = row.createCell(3);
+        cell.setCellValue("");
+
+        cell = row.createCell(4);
+        cell.setCellValue("");
+
+        cell = row.createCell(5);
+        cell.setCellValue("");
+
+        cell = row.createCell(6);
+        cell.setCellValue(fiberContent4);
+
+        cell = row.createCell(7);
+        cell.setCellValue(fiberContent5);
+
+        cell = row.createCell(8);
+        cell.setCellValue(fiberContent6);
+
+        cell = row.createCell(9);
+        cell.setCellValue("");
+
+        cell = row.createCell(10);
+        cell.setCellValue("");
+
+        cell = row.createCell(11);
+        cell.setCellValue("");
+
+        cell = row.createCell(12);
+        cell.setCellValue("");
+
+        cell = row.createCell(13);
+        cell.setCellValue("");
+
+        cell = row.createCell(14);
+        cell.setCellValue(data.getOrigin());
+
+        cell = row.createCell(15);
+        cell.setCellValue("");
+
+        cell = row.createCell(16);
+        cell.setCellValue(data.getHsCode());
+
+        cell = row.createCell(17);
+        cell.setCellValue(data.getPackageUnit());
+
+        cell = row.createCell(18);
+        cell.setCellValue("");
+
+        cell = row.createCell(19);
+        cell.setCellValue("NO");
+
+        cell = row.createCell(20);
+        cell.setCellValue("");
+
+        cell = row.createCell(21);
+        cell.setCellValue("B");
+
+        cell = row.createCell(22);
+        cell.setCellValue(data.getCompanyName());
+
+        dataRowStartIndex++;
+        return dataRowStartIndex;
+    }
+
+    private int setFirstRow(Sheet sheet, int dataRowStartIndex, DecimalFormat form, ResultExcel data) {
+        Row row;
+        Cell cell;
+        row = sheet.createRow(dataRowStartIndex);
+
+        cell = row.createCell(0);
+        cell.setCellValue(data.getInvoiceNo());
+
+        cell = row.createCell(1);
+        cell.setCellValue(data.getProductCode());
+
+        cell = row.createCell(2);
+        cell.setCellValue(data.getProductName1());
+
+        cell = row.createCell(3);
+        cell.setCellValue(data.getProductName2());
+
+        cell = row.createCell(4);
+        cell.setCellValue(data.getProductName3());
+
+        cell = row.createCell(5);
+        cell.setCellValue(data.getFabric());
+
+        cell = row.createCell(6);
+        cell.setCellValue(data.getFiberContent1());
+
+        cell = row.createCell(7);
+        cell.setCellValue(data.getFiberContent2());
+
+        cell = row.createCell(8);
+        cell.setCellValue(data.getFiberContent3());
+
+        cell = row.createCell(9);
+        cell.setCellValue("");
+
+        cell = row.createCell(10);
+        cell.setCellValue(data.getCount());
+
+        cell = row.createCell(11);
+        cell.setCellValue(data.getUnit());
+
+        cell = row.createCell(12);
+        cell.setCellValue(data.getUnitPrice());
+
+        cell = row.createCell(13);
+        cell.setCellValue(data.getTotalPrice());
+
+        cell = row.createCell(14);
+        cell.setCellValue(data.getOrigin());
+
+        cell = row.createCell(15);
+        cell.setCellValue(form.format(data.getCalculateWeight()));
+
+        cell = row.createCell(16);
+        cell.setCellValue(data.getHsCode());
+
+        cell = row.createCell(17);
+        cell.setCellValue(data.getPackageUnit());
+
+        cell = row.createCell(18);
+        cell.setCellValue(data.getPackageCount());
+
+        cell = row.createCell(19);
+        cell.setCellValue("NO");
+
+        cell = row.createCell(20);
+        cell.setCellValue("");
+
+        cell = row.createCell(21);
+        cell.setCellValue("B");
+
+        cell = row.createCell(22);
+        cell.setCellValue(data.getCompanyName());
+
+        dataRowStartIndex++;
+        return dataRowStartIndex;
     }
 }

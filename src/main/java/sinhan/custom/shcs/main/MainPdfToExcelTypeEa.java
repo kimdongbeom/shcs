@@ -110,8 +110,12 @@ public class MainPdfToExcelTypeEa {
                         }
                     }
                 }
-
-                String excelName = inputFile.split(".pdf")[0] + "_converted_excel.xls";
+                String excelName = "";
+                if (inputFile.contains(".pdf")) {
+                    excelName = inputFile.split(".pdf")[0] + "_converted_excel.xls";
+                } else if (inputFile.contains(".PDF")) {
+                    excelName = inputFile.split(".PDF")[0] + "_converted_excel.xls";
+                }
                 ExcelService excelService = new ExcelService();
                 excelService.excelWrite(dataList, outputPath + excelName);
             } catch(Exception e) {

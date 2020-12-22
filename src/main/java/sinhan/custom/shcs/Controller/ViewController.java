@@ -137,12 +137,18 @@ public class ViewController {
 
     @PostMapping(value = "/convert/excel", produces = "application/vnd.ms-excel")
     public ModelAndView downloadExcel(Model model, @RequestParam("file") MultipartFile multipartFile, HttpServletResponse response) {
-        List<ResultExcel> resultExcels = invoiceExcelService.convertExcelToResultModel(multipartFile);
-        String excelName = multipartFile.getOriginalFilename().split("\\.")[0] + "_converted_excel.xls";
-        model.addAttribute("rows", resultExcels);
+        try {
+            List<ResultExcel> resultExcels = invoiceExcelService.convertExcelToResultModel(multipartFile);
+            String excelName = multipartFile.getOriginalFilename().split("\\.")[0] + "_converted_excel.xls";
+            model.addAttribute("rows", resultExcels);
 
-        response.setContentType("application/ms-excel");
-        response.setHeader("Content-disposition", "attachment; filename=" + excelName);
+            response.setContentType("application/ms-excel");
+            response.setHeader("Content-disposition", "attachment; filename=" + excelName);
+        } catch (Exception e) {
+            ModelAndView mav = new ModelAndView("errorPage");
+            return mav;
+        }
+
         return new ModelAndView(new InvoiceExcelView());
     }
 }

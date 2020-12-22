@@ -75,10 +75,15 @@ public class ResultExcel {
         } else if ((400 <= contents.length()) && (contents.length() < 750)) {
             this.fiberContent1 = "(CONTINUE - 01/02)";
             this.fiberContent2 = contents.substring(0, 49);
-            this.fiberContent3 = contents.substring(50, 99);
+            this.fiberContent3 = contents.substring(50, 349);
             this.fiberContent4 = "(CONTINUE - 02/02)";
-            this.fiberContent5 = contents.substring(350, 399);
-            this.fiberContent6 = contents.substring(400, contentsLength);
+            if (contents.length() < 400) {
+                this.fiberContent5 = contents.substring(350, contentsLength);
+            } else {
+                this.fiberContent5 = contents.substring(350, 399);
+                this.fiberContent6 = contents.substring(400, contentsLength);
+            }
+
         } else if ((750 <= contents.length()) && (contents.length() < 1100)) {
             this.fiberContent1 = "(CONTINUE - 01/03)";
             this.fiberContent2 = contents.substring(0, 49);
@@ -87,8 +92,12 @@ public class ResultExcel {
             this.fiberContent5 = contents.substring(350, 399);
             this.fiberContent6 = contents.substring(400, 749);
             this.fiberContent7 = "(CONTINUE - 03/03)";
-            this.fiberContent8 = contents.substring(800, 849);
-            this.fiberContent9 = contents.substring(850, contentsLength);
+            if (contents.length() < 800) {
+                this.fiberContent8 = contents.substring(750, contentsLength);
+            } else {
+                this.fiberContent8 = contents.substring(750, 799);
+                this.fiberContent9 = contents.substring(800, contentsLength);
+            }
         }
     }
 }

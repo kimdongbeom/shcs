@@ -15,7 +15,9 @@ $(document).ready(function() {
             cache: false,
         }).done(function(fragment) {
             $("#fileList").replaceWith(fragment);
-            alert("성공적으로 업데이트 되었습니다.")
+            $("#btnSubmitPdf").prop("disabled", false);
+            $('#uploadDaPdf').val("");
+            alert("성공적으로 업데이트 되었습니다.");
         });
         e.stopPropagation();
     });

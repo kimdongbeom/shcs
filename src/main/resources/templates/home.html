@@ -71,7 +71,7 @@
             </div>
             <div id="fileList" style="border: 1.2px solid black;height:300px;overflow:auto;">
                 <span th:each="file : ${fileNames}">
-                    <span th:text="${file}" style="margin-right: 15px;" th:onclick="fileDelete([[${file}]]);"></span>
+                    <a><span th:text="${file}" style="margin-right: 15px;" th:onclick="fileDelete([[${file}]]);"></span></a>
                 </span>
             </div>
             <hr style="width:100%;">
