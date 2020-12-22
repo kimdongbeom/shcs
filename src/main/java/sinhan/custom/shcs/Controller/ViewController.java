@@ -128,9 +128,11 @@ public class ViewController {
     }
 
     private void exceptNotPdfFile(File[] filesAfterDelete, List<String> fileNames, String s) {
-        for (File file : filesAfterDelete) {
-            if (file.getName().contains(s)) {
-                fileNames.add(file.getName());
+        if (filesAfterDelete != null) {
+            for (File file : filesAfterDelete) {
+                if (file.getName().contains(s)) {
+                    fileNames.add(file.getName());
+                }
             }
         }
     }

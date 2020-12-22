@@ -166,7 +166,7 @@ public class MainReadExcel {
                 ExcelColumn data1 = excelColumnMaterialList.get(i);
                 ExcelColumn data2 = excelColumnMaterialList.get(i + 1);
 
-                material.setFabric(data1.getColumn7());
+                material.setFabric(data1.getColumn7().toUpperCase());
                 material.setMaterialId(data1.getColumn27());
                 material.setBalesOrRoll(data1.getColumn3(), data1.getColumn4());
                 material.setBalesOrRoll(data2.getColumn3(), data2.getColumn4());

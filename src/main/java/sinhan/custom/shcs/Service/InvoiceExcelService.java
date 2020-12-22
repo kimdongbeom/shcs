@@ -29,8 +29,7 @@ public class InvoiceExcelService {
         List<ResultExcel> resultExcelList = new ArrayList<>();
         String invoiceNo = "";
         try {
-            invoiceNo = multipartFile.getOriginalFilename();
-            File file = new File(invoiceNo);
+            File file = new File(multipartFile.getOriginalFilename());
 
 //            InputStream inputStream = new FileInputStream(file);
             InputStream inputStream = new ByteArrayInputStream(multipartFile.getBytes());
@@ -45,7 +44,6 @@ public class InvoiceExcelService {
             int rowCount = sheet.getPhysicalNumberOfRows();
             int colCount = sheet.getRow(3).getPhysicalNumberOfCells();
 
-            invoiceNo = invoiceNo.replace(".xls", "").replace(".", "/");
             List<ExcelColumn> materialList = new ArrayList<>();
             List<ExcelColumn> packingList = new ArrayList<>();
             String ctNo = "";
@@ -60,7 +58,10 @@ public class InvoiceExcelService {
 
                     String cellValue = formatter.formatCellValue(currentCell);
                     if (StringUtils.isNotBlank(cellValue)) {
-                        if (cellValue.contains("MATERIAL FOR KNITTED")) {
+                        if (cellValue.contains("(8)No. & date of invoice")) {
+                            Cell cell = sheet.getRow(i + 1).getCell(j);
+                            invoiceNo = formatter.formatCellValue(cell);
+                        } else if (cellValue.contains("MATERIAL FOR KNITTED")) {
                             isMatrialRange = true;
                         } else if (cellValue.contains("PACKING ACC")) {
                             isMatrialRange = false;
@@ -192,9 +193,7 @@ public class InvoiceExcelService {
                 material.setUnit(data2.getColumn19());
                 material.setUnitPrice(data2.getColumn21());
                 material.setTotalPrice(data2.getColumn26());
-                if (i == excelColumnMaterialList.size() - 1) {
-                    material.setIsLastSameMaterial(true);
-                }
+                material.setIsLastSameMaterial(true);
 
                 materials.add(material);
             }
@@ -346,7 +345,8 @@ public class InvoiceExcelService {
         for (String line : targetData) {
             String appendLine = "," + line;
             if (line.startsWith("WIDTH ")) {
-                strBuilder.append(appendLine);
+                isTargetContent = true;
+//                strBuilder.append(appendLine);
             }
 
             if (line.startsWith("WEIGHT : ")) {
@@ -355,7 +355,7 @@ public class InvoiceExcelService {
                 weight = Double.parseDouble(stream.filter((ch) -> (48 <= ch && ch <= 57) || (ch == 46)).mapToObj(ch -> (char)ch)
                         .map(Object::toString)
                         .collect(Collectors.joining()));
-                strBuilder.append(appendLine);
+                isTargetContent = true;
             }
 
             if (line.contains("FIBER CONTENT:")) {
