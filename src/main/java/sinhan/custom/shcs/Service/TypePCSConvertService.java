@@ -76,7 +76,7 @@ public class TypePCSConvertService {
                             String[] splitTargetForPcs = targetForPcs.split(" ");
                             pcs = splitTargetForPcs[splitTargetForPcs.length - 1].replace(",", "");
                             for (String target : splitTargetForMaterialNo) {
-                                if (target.length() == 13 && target.contains(".")) {
+                                if (target.length() == 13 && target.contains(".") && !target.contains(",")) {
                                     materialNo = target.replace(".", "");
                                     PDFExtractData pdfExtractData = new PDFExtractData(invoiceOrder,invoiceNo, materialNo, Double.valueOf(pcs));
                                     dataList.add(pdfExtractData);
