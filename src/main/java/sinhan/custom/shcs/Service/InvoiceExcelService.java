@@ -97,9 +97,11 @@ public class InvoiceExcelService {
                                             materialId = materialValue.replace("(", "").replace(")", "");
                                         }
 
-                                        if (materialValue.contains("PACKING ACC") || materialValue.contains("TOTAL NET WEIGHT")) {
+                                        if (materialValue.contains("PACKING ACC")) {
                                             isMatrialRange = false;
                                             break materialBreakOut;
+                                        } else if (materialValue.contains("TOTAL NET WEIGHT")) {
+                                            break breakOut;
                                         } else {
                                             excelColumn.setColumn(z, materialId, materialValue);
                                         }
@@ -157,7 +159,7 @@ public class InvoiceExcelService {
                 targetPackingList = makePackingModel(packingList);
             }
 
-            if (materialList.size() != 0 && packingList.size() != 0) {
+            if (materialList.size() != 0) {
                 materialList.get(0).setColumn1(ctNo);  //packingList 포장수량을 위한 값
                 filterMaterial = filterMaterial(materialList);
                 targetMaterialList= makeMaterialModel(filterMaterial);
