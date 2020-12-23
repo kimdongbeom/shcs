@@ -1,5 +1,6 @@
 package sinhan.custom.shcs.Controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Controller
 public class ViewController {
 
@@ -147,6 +149,7 @@ public class ViewController {
             response.setContentType("application/ms-excel");
             response.setHeader("Content-disposition", "attachment; filename=" + excelName);
         } catch (Exception e) {
+            log.error("Convert Excel is Error", e);
             ModelAndView mav = new ModelAndView("errorPage");
             return mav;
         }

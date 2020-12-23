@@ -40,8 +40,10 @@ public class Material {
     }
 
     public void setHsCode(String hsCode) {
-        String code = hsCode.split(" : ")[1];
-        this.hsCode = code;
+        if (StringUtils.isNotBlank(hsCode)) {
+            hsCode = hsCode.split(" : ")[1];
+        }
+        this.hsCode = hsCode;
     }
 
     public void setBalesOrRoll(String count, String name) {

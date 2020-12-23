@@ -3,6 +3,7 @@ package sinhan.custom.shcs.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 @Getter
 @Setter
@@ -18,8 +19,10 @@ public class Packing {
     private double totalPrice; //금액
 
     public void setHsCode(String hsCode) {
-        String code = hsCode.split(" : ")[1];
-        this.hsCode = code;
+        if (StringUtils.isNotBlank(hsCode)) {
+            hsCode = hsCode.split(" : ")[1];
+        }
+        this.hsCode = hsCode;
     }
 
     public void setUnitPrice(String value) {

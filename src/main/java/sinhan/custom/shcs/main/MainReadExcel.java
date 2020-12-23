@@ -226,7 +226,7 @@ public class MainReadExcel {
 
         while (iterator.hasNext()) {
             String materialId = iterator.next();
-            String pdfFilePath = pdfFileFolder + materialId + ".pdf";
+            String pdfFilePath = pdfFileFolder + materialId;
 
             String[] lines = readPdf(pdfFilePath);
             makeReultData(materialId, lines, materialList);
@@ -333,7 +333,14 @@ public class MainReadExcel {
     }
 
     private static String[] readPdf(String filePath) {
-        File file = new File(filePath);
+        String filePath1 = filePath + ".pdf";
+        String filePath2 = filePath + ".PDF";
+
+        File file = new File(filePath1);
+        if (file == null) {
+            file = new File(filePath2);
+        }
+
         PDDocument document = null;
         PDFTextStripper pdfStripper = null;
         String pages = "";

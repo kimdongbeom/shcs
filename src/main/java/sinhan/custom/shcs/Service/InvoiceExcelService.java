@@ -68,7 +68,9 @@ public class InvoiceExcelService {
                             isPackingRange = true;
                         } else if (cellValue.contains("TOTAL NET WEIGHT")) {
                             Cell cell = sheet.getRow(i).getCell(j+3);
-                            packingList.get(0).setColumn0(formatter.formatCellValue(cell));
+                            if (packingList.size() != 0) {
+                                packingList.get(0).setColumn0(formatter.formatCellValue(cell));
+                            }
                         } else if (cellValue.contains("PACKING LIST")) {
                             break breakOut;
                         }
@@ -92,17 +94,19 @@ public class InvoiceExcelService {
                                         String materialValue = formatter.formatCellValue(materialCell);
 
                                         if (materialValue.startsWith("(") && materialValue.endsWith(")")) {
-                                            materialId = cellValue.replace("(", "").replace(")", "");
+                                            materialId = materialValue.replace("(", "").replace(")", "");
                                         }
 
-                                        if (materialValue.contains("PACKING ACC")) {
+                                        if (materialValue.contains("PACKING ACC") || materialValue.contains("TOTAL NET WEIGHT")) {
                                             isMatrialRange = false;
                                             break materialBreakOut;
                                         } else {
                                             excelColumn.setColumn(z, materialId, materialValue);
                                         }
                                     }
-                                    materialList.add(excelColumn);
+                                    if (!excelColumn.getColumn7().startsWith("(") && !excelColumn.getColumn7().endsWith(")") && (StringUtils.isNotBlank(excelColumn.getColumn7()) || StringUtils.isNotBlank(excelColumn.getColumn16()))) {
+                                        materialList.add(excelColumn);
+                                    }
                                 }
                             }
                         }
@@ -126,10 +130,10 @@ public class InvoiceExcelService {
                                         excelColumn.setColumn(z, packingId, materialValue);
                                     }
 
-                                    if (StringUtils.isBlank(excelColumn.getColumn6()) && StringUtils.isBlank(excelColumn.getColumn7()) && StringUtils.isBlank(excelColumn.getColumn12())) {
+                                    if (StringUtils.isBlank(excelColumn.getColumn6()) && StringUtils.isBlank(excelColumn.getColumn7()) && StringUtils.isBlank(excelColumn.getColumn12()) && StringUtils.isBlank(excelColumn.getColumn16())) {
                                         isPackingRange = false;
                                         break packingBreak;
-                                    } else if (StringUtils.isBlank(excelColumn.getColumn7()) && StringUtils.isBlank(excelColumn.getColumn12())) {
+                                    } else if (StringUtils.isBlank(excelColumn.getColumn7()) && StringUtils.isBlank(excelColumn.getColumn12()) && StringUtils.isBlank(excelColumn.getColumn16())) {
                                         continue;
                                     } else {
                                         if (StringUtils.equals(excelColumn.getColumn7().replace("(", "").replace(")", ""), packingId)) {
@@ -145,12 +149,25 @@ public class InvoiceExcelService {
                 }
             }
 
-            materialList.get(0).setColumn1(ctNo);  //packingList 포장수량을 위한 값
+            List<ExcelColumn> filterMaterial = new ArrayList<>();
+            List<Material> targetMaterialList = new ArrayList<>();
+            List<Packing> targetPackingList = new ArrayList<>();
 
-            List<Material> targetMaterialList = makeMaterialModel(materialList);
-            List<Packing> targetPackingList = makePackingModel(packingList);
+            if (packingList.size() != 0) {
+                targetPackingList = makePackingModel(packingList);
+            }
 
+            if (materialList.size() != 0 && packingList.size() != 0) {
+                materialList.get(0).setColumn1(ctNo);  //packingList 포장수량을 위한 값
+                filterMaterial = filterMaterial(materialList);
+                targetMaterialList= makeMaterialModel(filterMaterial);
+
+            }
             resultExcelList = findMatchedPdfAndMakeData(targetMaterialList, targetPackingList);
+
+
+
+
 
             /*
                 todo
@@ -168,6 +185,20 @@ public class InvoiceExcelService {
             e.printStackTrace();
         }
         return resultExcelList;
+    }
+
+    private List<ExcelColumn> filterMaterial(List<ExcelColumn> materialList) {
+        List<ExcelColumn> filteredMaterials = new ArrayList<>();
+
+        for (ExcelColumn data : materialList) {
+            if (StringUtils.isNotBlank(data.getColumn3()) || StringUtils.isNotBlank(data.getColumn4()) ||
+                    StringUtils.isNotBlank(data.getColumn6()) || StringUtils.isNotBlank(data.getColumn7()) ||
+                    StringUtils.isNotBlank(data.getColumn12()) || StringUtils.isNotBlank(data.getColumn19()) ||
+                    StringUtils.isNotBlank(data.getColumn20()) || StringUtils.isNotBlank(data.getColumn21())) {
+                filteredMaterials.add(data);
+            }
+        }
+        return filteredMaterials;
     }
 
     private List<Material> makeMaterialModel(List<ExcelColumn> excelColumnMaterialList) {
@@ -199,10 +230,14 @@ public class InvoiceExcelService {
             }
         }
 
-        if (materials.get(1) != null) {
-            materials.get(0).setCtNo(Integer.parseInt(excelColumnMaterialList.get(0).getColumn1()) + materials.get(0).getRoll() + materials.get(1).getRoll());
+        if (materials.size() > 1) {
+            if (StringUtils.isNotBlank(excelColumnMaterialList.get(0).getColumn1())) {
+                materials.get(0).setCtNo(Integer.parseInt(excelColumnMaterialList.get(0).getColumn1()) + materials.get(0).getRoll() + materials.get(1).getRoll());
+            }
         } else {
-            materials.get(0).setCtNo(Integer.parseInt(excelColumnMaterialList.get(0).getColumn1()) + materials.get(0).getRoll());
+            if (StringUtils.isNotBlank(excelColumnMaterialList.get(0).getColumn1())) {
+                materials.get(0).setCtNo(Integer.parseInt(excelColumnMaterialList.get(0).getColumn1()) + materials.get(0).getRoll());
+            }
         }
 
         return materials;
@@ -210,8 +245,6 @@ public class InvoiceExcelService {
 
     private List<Packing> makePackingModel(List<ExcelColumn> excelColumnPackingList) {
         // 2개 라인을 읽어서 1개의 Packing으로 작업
-        System.out.println(excelColumnPackingList.size());
-
         List<Packing> packings = new ArrayList<>();
 
         for (int i = 0; i < excelColumnPackingList.size(); i++) {
@@ -266,7 +299,9 @@ public class InvoiceExcelService {
 
         double materialUnitPriceSum = resultExcels.stream().map(x -> x.getCalculateWeight()).reduce(0.0, (a,b) -> a + b);
 
-        resultExcels.addAll(makePackingResultData(packingList, materialList, materialUnitPriceSum));
+        if (packingList.size() != 0) {
+            resultExcels.addAll(makePackingResultData(packingList, materialList, materialUnitPriceSum));
+        }
 
         return resultExcels;
     }
@@ -295,8 +330,10 @@ public class InvoiceExcelService {
             resultPackingExcelList.add(result);
         }
 
-        resultPackingExcelList.get(0).setCalculateWeight(packingList.get(0).getUnitPrice() - materialUnitPriceSum);
-        resultPackingExcelList.get(0).setPackageCount(materialList.get(0).getCtNo());
+        if (materialList.size() != 0) {
+            resultPackingExcelList.get(0).setCalculateWeight(packingList.get(0).getUnitPrice() - materialUnitPriceSum);
+            resultPackingExcelList.get(0).setPackageCount(materialList.get(0).getCtNo());
+        }
 
         return resultPackingExcelList;
     }
@@ -310,7 +347,7 @@ public class InvoiceExcelService {
                 breakThisMaterial:
                 for (int i = 0; i < lines.length; i++) {
                     if (lines[i].contains(material.getFabric())) {
-                        if (lines[i + 4].contains(material.getWidth().split("WIDTH : ")[1])) {
+                        if (lines[i + 4].contains(material.getWidth().split("WIDTH : ")[1]) || lines[i + 5].contains(material.getWidth().split("WIDTH : ")[1])) {
                             isTargetBlock = true;
                         }
                     }
@@ -329,7 +366,9 @@ public class InvoiceExcelService {
                 }
             }
 
-            resultMaterialExcelList.add(mappingMaterialAndPdfData(material, targetData));
+            if (targetData.size() != 0) {
+                resultMaterialExcelList.add(mappingMaterialAndPdfData(material, targetData));
+            }
         }
 
         return resultMaterialExcelList;
@@ -374,7 +413,11 @@ public class InvoiceExcelService {
         result.setInvoiceNo(material.getInvoiceNo());
         result.setProductCode(material.getMaterialId() + material.getUnitPrice());
         result.setProductName1("(" + material.getMaterialId() + ") KNITTED FABRIC");
-        result.setProductName2(targetData.get(4) + " " + targetData.get(5)); // WIDTH, WEIGHT
+        if (targetData.get(4).startsWith("WIDTH") && targetData.get(5).startsWith("WEIGHT")) {
+            result.setProductName2(targetData.get(4) + " " + targetData.get(5)); // WIDTH, WEIGHT
+        } else if (targetData.get(5).startsWith("WIDTH") && targetData.get(6).startsWith("WEIGHT")) {
+            result.setProductName2(targetData.get(5) + " " + targetData.get(6)); // WIDTH, WEIGHT
+        }
         result.setProductName3(targetData.get(0), material.isLastSameMaterial());
         result.setFabric(material.getFabric());
         result.setFiberContentOrigin(strBuilder.toString());
