@@ -37,7 +37,7 @@
                 </div>
             </form>
         </div>
-        <div id="lenovo" th:classappend="${service} == 'invoice' ? 'in active' : ''" class="tab-pane fade">
+        <div id="lenovo" th:classappend="${service} == 'lenovo' ? 'in active' : ''" class="tab-pane fade">
             <h3>LENOVO PDF Excel 변환</h3>
             <p class="lead"><h5>변환전 PDF와 PDF포맷을 확인해주세요! 이미지형태의 PDF는 변환이 되지 않습니다.</h5></p>
             <form id="fileUploadFormLenovo" method="POST" enctype="multipart/form-data">
@@ -51,7 +51,7 @@
                 </div>
             </form>
         </div>
-        <div id="invoice" th:classappend="${service} == 'lenovo' ? 'in active' : ''" class="tab-pane fade">
+        <div id="invoice" th:classappend="${service} == 'invoice' ? 'in active' : ''" class="tab-pane fade">
             <h3>INVOICE, DA 관리 및 엑셀처리 작업</h3>
             <p class="lead"><h5>엑셀 업로드 전 해당 원단의 PDF가 있는지 확인해주세요.</h5></p>
             <div>
