@@ -63,17 +63,18 @@ public class TypeLenovoDELConvertService {
 
                         if (splitLine.length == 3 && splitLine[2].length() == 18) {
 
-                            productIdentification = lines[i+1].trim();
+
                             String[] next2LineWords = lines[i+2].split(" ");
 
-                            if (next2LineWords.length == 7) {
+                            if (next2LineWords.length == 7 && !next2LineWords[next2LineWords.length - 1].equals("DIMENSIONS") && StringUtils.isNotBlank(next2LineWords[0])) {
                                 lenovo.setProductDescription(lines[i+1].trim());
                                 lenovo.splitLineDataDEL(lines[i+2]);
                             } else {
                                 isChangedPage = true;
                                 for (int j=i+2; j < lines.length; j++) {
                                     String[] nextLine = lines[j].split(" ");
-                                    if (nextLine.length == 7) {
+                                    if (nextLine.length == 7 && !nextLine[nextLine.length - 1].equals("DIMENSIONS") && StringUtils.isNotBlank(nextLine[0])) {
+                                        productIdentification = lines[j-1].trim();
                                         lenovo.splitLineDataDEL(lines[j]);
                                         if (isSameBlock) {
                                             // 페이지가 바뀌는 부분이라서 이전 데이터의 description과 동일하기 떄문에 동일한 값을 넣어준다.
