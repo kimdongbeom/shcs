@@ -75,6 +75,9 @@ public class TypeLenovoDELConvertService {
                                     String[] nextLine = lines[j].split(" ");
                                     if (nextLine.length == 7 && !nextLine[nextLine.length - 1].equals("DIMENSIONS") && StringUtils.isNotBlank(nextLine[0])) {
                                         productIdentification = lines[j-1].trim();
+                                        if (productIdentification.equals("FCA Free carrier")) {
+                                            productIdentification = lines[i+1].trim();
+                                        }
                                         lenovo.splitLineDataDEL(lines[j]);
                                         if (isSameBlock) {
                                             // 페이지가 바뀌는 부분이라서 이전 데이터의 description과 동일하기 떄문에 동일한 값을 넣어준다.
