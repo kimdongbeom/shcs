@@ -226,7 +226,14 @@ public class InvoiceExcelService {
                 material.setUnit(data2.getColumn19());
                 material.setUnitPrice(data2.getColumn21());
                 material.setTotalPrice(data2.getColumn26());
-                material.setIsLastSameMaterial(true);
+                if ((i + 2) < excelColumnMaterialList.size()) {
+                    ExcelColumn data3 = excelColumnMaterialList.get(i + 2);
+                    if (!data1.getColumn28().equals(data3.getColumn28())) {
+                        material.setIsLastSameMaterial(true);
+                    }
+                } else if ((i + 2) == excelColumnMaterialList.size()) {
+                    material.setIsLastSameMaterial(true);
+                }
 
                 materials.add(material);
             }
@@ -380,14 +387,15 @@ public class InvoiceExcelService {
         ResultExcel result = new ResultExcel();
 
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append("BODY" + targetData.get(0).split(" : ")[1]);
+        String name = targetData.get(0).split(" ")[1];
+
+        strBuilder.append(name + ":" + targetData.get(0).split(" : ")[1]);
         double weight = 0.0;
         boolean isTargetContent = false;
         for (String line : targetData) {
-            String appendLine = "," + line;
+            String appendLine = " " + line;
             if (line.startsWith("WIDTH ")) {
                 isTargetContent = true;
-//                strBuilder.append(appendLine);
             }
 
             if (line.startsWith("WEIGHT : ")) {
@@ -408,7 +416,7 @@ public class InvoiceExcelService {
             }
 
             if (isTargetContent) {
-                strBuilder.append(appendLine);
+                strBuilder.append(appendLine.replace("  ", " "));
             }
         }
 

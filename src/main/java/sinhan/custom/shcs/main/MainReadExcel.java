@@ -313,7 +313,7 @@ public class MainReadExcel {
 
         result.setInvoiceNo("");
         result.setProductCode(material.getMaterialId() + material.getUnitPrice());
-        result.setProductName1("(" + material.getMaterialId() + ") KNITTED FABRIC");
+        result.setProductName1(material.getMaterialId(), material.getHsCode());
         result.setProductName2(targetData.get(4) + " " + targetData.get(5)); // WIDTH, WEIGHT
         result.setProductName3(targetData.get(0), material.isLastSameMaterial());
         result.setFabric(material.getFabric());
