@@ -4,7 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,16 +25,16 @@ import sinhan.custom.shcs.model.PDFExtractData;
 import sinhan.custom.shcs.model.ResultExcel;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Controller
 public class ViewController {
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     @Value("${da.pdf.upload.dir}")
     private String daPdfUploadDir;
@@ -140,7 +144,6 @@ public class ViewController {
             FileInputStream is = new FileInputStream(daPdfUploadDir + fileName);
             IOUtils.copy(is, response.getOutputStream());
             response.setHeader("Content-Disposition", "attachment; filename=Accepted.pdf");
-            response.setCharacterEncoding("UTF-8");
             response.flushBuffer();
         } catch (IOException e) {
             e.printStackTrace();
