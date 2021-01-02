@@ -275,7 +275,7 @@ public class InvoiceExcelService {
                 packings.add(packing);
             }
         }
-        packings.get(0).setUnitPrice(excelColumnPackingList.get(0).getColumn0());
+        packings.get(0).setTotalNetWeight(excelColumnPackingList.get(0).getColumn0());
         return packings;
     }
 
@@ -340,7 +340,7 @@ public class InvoiceExcelService {
         }
 
         if (materialList.size() != 0) {
-            resultPackingExcelList.get(0).setCalculateWeight(packingList.get(0).getUnitPrice() - materialUnitPriceSum);
+            resultPackingExcelList.get(0).setCalculateWeight(packingList.get(0).getTotalNetWeight() - materialUnitPriceSum);
             resultPackingExcelList.get(0).setPackageCount(materialList.get(0).getCtNo());
         }
 

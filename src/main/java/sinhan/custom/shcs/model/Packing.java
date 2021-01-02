@@ -17,6 +17,7 @@ public class Packing {
     private double quantity; //수량
     private double unitPrice; //단가
     private double totalPrice; //금액
+    private double totalNetWeight;
 
     public void setHsCode(String hsCode) {
         if (StringUtils.isNotBlank(hsCode)) {
@@ -35,5 +36,9 @@ public class Packing {
 
     public void setQuantity(String value) {
         this.quantity = Double.parseDouble(value.replace(",", ""));
+    }
+
+    public void setTotalNetWeight(String value) {
+        this.totalNetWeight = Double.parseDouble(value.replace(",", ""));
     }
 }

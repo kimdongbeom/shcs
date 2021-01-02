@@ -71,7 +71,9 @@
             </div>
             <div id="fileList" style="border: 1.2px solid black;height:300px;overflow:auto;">
                 <span th:each="file : ${fileNames}">
-                    <a><span th:text="${file}" style="margin-right: 15px;" th:onclick="fileDelete([[${file}]]);"></span></a>
+                    <div style="width: 33%; float: left;">
+                        <a><span th:text="${file}" style="margin-right: 15px;"></span></a><a><span th:onclick="fileDelete([[${file}]]);">삭제</span></a>
+                    </div>
                 </span>
             </div>
             <hr style="width:100%;">
@@ -115,7 +117,25 @@
         } else {
             console.log("no")
         }
+    }
 
+    function pdfPreview(fileName) {
+        var previewFlag = confirm(fileName + "미리보시겠습니까?");
+
+        if (previewFlag) {
+            $.ajax({
+                type: 'GET',
+                enctype: 'multipart/form-data',
+                url: '/preview/pdf?file=' + fileName,
+                processData: false,
+                contentType: false,
+                cache: false,
+            }).done(function(fragment) {
+                $("#fileList").replaceWith(fragment);
+            });;
+        } else {
+            console.log("no")
+        }
     }
 </script>
 </body>
