@@ -4,11 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.*;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,13 +17,18 @@ import sinhan.custom.shcs.ExcelView.BoschExcelView;
 import sinhan.custom.shcs.ExcelView.InvoiceExcelView;
 import sinhan.custom.shcs.ExcelView.LenovoExcelView;
 import sinhan.custom.shcs.Service.InvoiceExcelService;
+import sinhan.custom.shcs.model.FileInfo;
 import sinhan.custom.shcs.model.Lenovo;
 import sinhan.custom.shcs.model.PDFExtractData;
 import sinhan.custom.shcs.model.ResultExcel;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -46,12 +48,12 @@ public class ViewController {
     public String main(Model model, @RequestParam(value = "param", defaultValue = "bosch") String param) {
         File dir = new File(daPdfUploadDir);
         File files[] = dir.listFiles();
-        List<String> fileNames = new ArrayList<>();
+        List<FileInfo> fileList = new ArrayList<>();
 
-        exceptNotPdfFile(files, fileNames, ".pdf");
+        exceptNotPdfFile(files, fileList, ".pdf");
 
         model.addAttribute("service", param);
-        model.addAttribute("fileNames", fileNames);
+        model.addAttribute("fileList", fileList);
 
         return "home";
     }
@@ -98,11 +100,11 @@ public class ViewController {
 
         File dir = new File(daPdfUploadDir);
         File files[] = dir.listFiles();
-        List<String> fileNames = new ArrayList<>();
+        List<FileInfo> fileList = new ArrayList<>();
 
-        exceptNotPdfFile(files, fileNames, ".pdf");
+        exceptNotPdfFile(files, fileList, ".pdf");
 
-        model.addAttribute("fileNames", fileNames);
+        model.addAttribute("fileList", fileList);
         return "home ::#fileList";
     }
 
@@ -110,11 +112,11 @@ public class ViewController {
     public String searchPdfFile(Model model, @RequestParam("query") String query) {
         File dir = new File(daPdfUploadDir);
         File files[] = dir.listFiles();
-        List<String> fileNames = new ArrayList<>();
+        List<FileInfo> fileList = new ArrayList<>();
 
-        exceptNotPdfFile(files, fileNames, query);
+        exceptNotPdfFile(files, fileList, query);
 
-        model.addAttribute("fileNames", fileNames);
+        model.addAttribute("fileList", fileList);
         return "home ::#fileList";
     }
 
@@ -129,11 +131,11 @@ public class ViewController {
         }
 
         File filesAfterDelete[] = dir.listFiles();
-        List<String> fileNames = new ArrayList<>();
+        List<FileInfo> fileList = new ArrayList<>();
 
-        exceptNotPdfFile(filesAfterDelete, fileNames, ".pdf");
+        exceptNotPdfFile(filesAfterDelete, fileList, ".pdf");
 
-        model.addAttribute("fileNames", fileNames);
+        model.addAttribute("fileList", fileList);
         return "home ::#fileList";
     }
 
@@ -150,11 +152,16 @@ public class ViewController {
         }
     }
 
-    private void exceptNotPdfFile(File[] filesAfterDelete, List<String> fileNames, String s) {
+    private void exceptNotPdfFile(File[] filesAfterDelete, List<FileInfo> fileList, String s) {
+        List<FileInfo> fileInfos = new ArrayList<>();
         if (filesAfterDelete != null) {
             for (File file : filesAfterDelete) {
                 if (file.getName().contains(s)) {
-                    fileNames.add(file.getName());
+                    long lastModified = file.lastModified();
+                    FileInfo fileInfo = new FileInfo();
+                    String pattern = "yyyy-MM-dd hh:mm:ss";
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                    fileList.add(new FileInfo(file.getName(), simpleDateFormat.format(lastModified)));
                 }
             }
         }

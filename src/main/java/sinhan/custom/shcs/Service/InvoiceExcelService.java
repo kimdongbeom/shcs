@@ -393,7 +393,7 @@ public class InvoiceExcelService {
         double weight = 0.0;
         boolean isTargetContent = false;
         for (String line : targetData) {
-            String appendLine = " " + line;
+            String appendLine = "," + line;
             if (line.startsWith("WIDTH ")) {
                 isTargetContent = true;
             }

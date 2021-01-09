@@ -70,9 +70,11 @@
                 </div>
             </div>
             <div id="fileList" style="border: 1.2px solid black;height:300px;overflow:auto;">
-                <span th:each="file : ${fileNames}">
+                <span th:each="file : ${fileList}">
                     <div style="width: 33%; float: left;">
-                        <a target="_blank" th:text="${file}" style="margin-right: 15px;" th:onclick="pdfPreview([[${file}]]);"></a><a><span th:onclick="fileDelete([[${file}]]);" style="color:red">삭제</span></a>
+                        <a target="_blank" th:text="${file.fileName}" style="margin-right: 15px;" th:onclick="pdfPreview([[${file}]]);"></a>
+                        <span th:text="${file.date}"></span>
+                        <a><span th:onclick="fileDelete([[${file}]]);" style="color:red">삭제</span></a>
                     </div>
 
                 </span>
@@ -96,9 +98,6 @@
 <script type="text/javascript" src="../static/js/lenovo.js"></script>
 <script type="text/javascript" src="../static/js/invoice.js"></script>
 <script  th:inline="javascript">
-    /*<![CDATA[*/
-    var testValue = [[${fileNames}]];
-    /*]]>*/
 
     function fileDelete(fileName) {
         var deleteFlag = confirm(fileName + "을 삭제하시겠습니까?");
