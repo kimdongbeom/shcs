@@ -418,7 +418,10 @@ public class InvoiceExcelService {
             }
 
             if (line.contains("FIBER CONTENT:")) {
-                isTargetContent = true;
+                String temp = line.replace(" ", "");
+                if (temp.length() > 14) {
+                    isTargetContent = true;
+                }
             }
 
             if (line.contains("YDS") && line.contains("US$")) {
