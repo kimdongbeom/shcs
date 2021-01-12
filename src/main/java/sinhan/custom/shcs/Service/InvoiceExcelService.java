@@ -283,7 +283,7 @@ public class InvoiceExcelService {
         // 원단 파일을 넘겨받아 PDF에서 해당 매칭 데이터를 찾아 긁어오기
 
         List<ResultExcel> resultExcels = new ArrayList<>();
-        Set<String> materialIds = new HashSet<>();
+        Set<String> materialIds = new LinkedHashSet<>();
         for (Material material : materialList) {
             materialIds.add(material.getMaterialId());
         }
@@ -387,9 +387,19 @@ public class InvoiceExcelService {
         ResultExcel result = new ResultExcel();
 
         StringBuilder strBuilder = new StringBuilder();
-        String name = targetData.get(0).split(" ")[1];
+        String name = "";
+        String firstLine = "";
+        int plusIndex = 0;
+        for (int i=0; i < targetData.size(); i++) {
+            if (targetData.get(i).contains(" BODY") || targetData.get(i).contains(" TRIM")) {
+                firstLine = targetData.get(i);
+                name = targetData.get(0).split(" ")[1];
+                plusIndex = i;
+                strBuilder.append(name + ":" + targetData.get(i).split(" : ")[1]);
+                break;
+            }
+        }
 
-        strBuilder.append(name + ":" + targetData.get(0).split(" : ")[1]);
         double weight = 0.0;
         boolean isTargetContent = false;
         for (String line : targetData) {
@@ -420,15 +430,23 @@ public class InvoiceExcelService {
             }
         }
 
+        String changeMaterialId = material.getMaterialId().replaceFirst("-", "=");
+        String tempMaterialId = changeMaterialId.replace("-", "");
+        String resultMaterialId = tempMaterialId.replace("=", "-");
+
         result.setInvoiceNo(material.getInvoiceNo());
-        result.setProductCode(material.getMaterialId() + material.getUnitPrice());
-        result.setProductName1("(" + material.getMaterialId() + ") KNITTED FABRIC");
+        result.setProductCode(resultMaterialId + material.getUnitPrice());
+        result.setProductName1("(" + resultMaterialId + ") KNITTED FABRIC");
         if (targetData.get(4).startsWith("WIDTH") && targetData.get(5).startsWith("WEIGHT")) {
             result.setProductName2(targetData.get(4) + " " + targetData.get(5)); // WIDTH, WEIGHT
         } else if (targetData.get(5).startsWith("WIDTH") && targetData.get(6).startsWith("WEIGHT")) {
             result.setProductName2(targetData.get(5) + " " + targetData.get(6)); // WIDTH, WEIGHT
+        } else if (targetData.get(6).startsWith("WIDTH") && targetData.get(7).startsWith("WEIGHT")) {
+            result.setProductName2(targetData.get(6) + " " + targetData.get(7)); // WIDTH, WEIGHT
+        } else if (targetData.get(8).startsWith("WIDTH") && targetData.get(9).startsWith("WEIGHT")) {
+            result.setProductName2(targetData.get(8) + " " + targetData.get(9)); // WIDTH, WEIGHT
         }
-        result.setProductName3(targetData.get(0), material.isLastSameMaterial());
+        result.setProductName3(firstLine, material.isLastSameMaterial());
         result.setFabric(material.getFabric());
         result.setFiberContentOrigin(strBuilder.toString());
         result.setCount(material.getQuantity());
@@ -437,14 +455,14 @@ public class InvoiceExcelService {
         result.setTotalPrice(material.getTotalPrice());
         result.setOrigin("KR");
         result.setCalculateWeight((material.getQuantity() * weight) / 1000);
-        if (targetData.get(0).contains("BODY")) {
-            result.setHsCode(targetData.get(0).split(" BODY")[0].replace(".", ""));
-        } else if (targetData.get(0).contains("TRIM")) {
-            result.setHsCode(targetData.get(0).split(" TRIM")[0].replace(".", ""));
+        if (firstLine.contains("BODY")) {
+            result.setHsCode(firstLine.split(" BODY")[0].replace(".", ""));
+        } else if (firstLine.contains("TRIM")) {
+            result.setHsCode(firstLine.split(" TRIM")[0].replace(".", ""));
         }
         result.setPackageUnit("BL");
         result.setPackageCount(material.getBales());
-        result.setCompanyName(targetData.get(1) + targetData.get(2) + targetData.get(3));
+        result.setCompanyName(targetData.get(1+plusIndex) + targetData.get(2+plusIndex) + targetData.get(3+plusIndex));
 
         return result;
     }
