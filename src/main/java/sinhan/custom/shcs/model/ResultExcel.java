@@ -60,29 +60,29 @@ public class ResultExcel {
         }
     }
 
-    public void setProductName3(String hsCode, boolean lastSameMaterial) {
+    public void appendProductName3(String changedProductName3) {
+        this.productName3 = changedProductName3;
+    }
+
+    public void setProductName3(String hsCode) {
         String hsCodeMiddleValue = hsCode.split("\\.")[1]; //6006.22.0000  => 22,32,42이면 DYED, 24,34,44 이면 PRINT
-        String value1 = "";
-        String value2 = "";
+        String hsCodeValue = "";
 
         if (hsCode.split("\\.")[0].startsWith("6006")) {
             if (hsCodeMiddleValue.endsWith("22") || hsCodeMiddleValue.endsWith("32") || hsCodeMiddleValue.endsWith("42")) {
-                value1 = "DYED ";
+                hsCodeValue = "DYED ";
             } else if (hsCodeMiddleValue.endsWith("24") || hsCodeMiddleValue.endsWith("34") || hsCodeMiddleValue.endsWith("44")) {
-                value1 = "PRINT ";
+                hsCodeValue = "PRINT ";
             } else if (hsCodeMiddleValue.endsWith("31") || hsCodeMiddleValue.endsWith("32") || hsCodeMiddleValue.endsWith("33") || hsCodeMiddleValue.endsWith("39")) {
-                value1 = "DYED ";
+                hsCodeValue = "DYED ";
             }
         } else if (hsCode.split("\\.")[0].startsWith("5208")) {
             if (hsCodeMiddleValue.endsWith("23") || hsCodeMiddleValue.endsWith("33") || hsCodeMiddleValue.endsWith("43") || hsCodeMiddleValue.endsWith("39")) {
-                value1 = "YARN DYED ";
+                hsCodeValue = "YARN DYED ";
             }
         }
 
-        if (lastSameMaterial) {
-            value2 = "ATTACHED ITEM";
-        }
-        this.productName3 = value1 + value2;
+        this.productName3 = hsCodeValue;
     }
 
     public void setFiberContentOrigin(String contents) {

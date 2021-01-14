@@ -176,9 +176,6 @@ public class MainReadExcel {
                 material.setUnit(data2.getColumn19());
                 material.setUnitPrice(data2.getColumn21());
                 material.setTotalPrice(data2.getColumn26());
-                if (i == excelColumnMaterialList.size() - 1) {
-                    material.setIsLastSameMaterial(true);
-                }
 
                 materials.add(material);
             }
@@ -315,7 +312,7 @@ public class MainReadExcel {
         result.setProductCode(material.getMaterialId() + material.getUnitPrice());
         result.setProductName1(material.getMaterialId(), material.getHsCode());
         result.setProductName2(targetData.get(4) + " " + targetData.get(5)); // WIDTH, WEIGHT
-        result.setProductName3(targetData.get(0), material.isLastSameMaterial());
+        result.setProductName3(targetData.get(0));
         result.setFabric(material.getFabric());
         result.setFiberContentOrigin(strBuilder.toString());
         result.setCount(material.getQuantity());

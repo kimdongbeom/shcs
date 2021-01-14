@@ -226,14 +226,6 @@ public class InvoiceExcelService {
                 material.setUnit(data2.getColumn19());
                 material.setUnitPrice(data2.getColumn21());
                 material.setTotalPrice(data2.getColumn26());
-                if ((i + 2) < excelColumnMaterialList.size()) {
-                    ExcelColumn data3 = excelColumnMaterialList.get(i + 2);
-                    if (!data1.getColumn28().equals(data3.getColumn28())) {
-                        material.setIsLastSameMaterial(true);
-                    }
-                } else if ((i + 2) == excelColumnMaterialList.size()) {
-                    material.setIsLastSameMaterial(true);
-                }
 
                 materials.add(material);
             }
@@ -380,6 +372,17 @@ public class InvoiceExcelService {
             }
         }
 
+        for (int i=0; i < resultMaterialExcelList.size(); i++) {
+            if (i+1 < resultMaterialExcelList.size()) {
+                // 만약 다음 result모델 값과 HSCODE가 같지 않다면 i 모델의 HSCODE에 ATTACHED ITEM을 붙여줌
+                if (!resultMaterialExcelList.get(i).getHsCode().equals(resultMaterialExcelList.get(i+1).getHsCode())) {
+                    String origin = resultMaterialExcelList.get(i).getProductName3();
+                    String changedOrigin = origin + "ATTACHED ITEM";
+                    resultMaterialExcelList.get(i).appendProductName3(changedOrigin);
+                }
+            }
+        }
+
         return resultMaterialExcelList;
     }
 
@@ -409,12 +412,14 @@ public class InvoiceExcelService {
             }
 
             if (line.startsWith("WEIGHT : ")) {
-                String tempWeight = line.split("WEIGHT : ")[1].split(" ")[0];
-                IntStream stream = tempWeight.chars();
-                weight = Double.parseDouble(stream.filter((ch) -> (48 <= ch && ch <= 57) || (ch == 46)).mapToObj(ch -> (char)ch)
-                        .map(Object::toString)
-                        .collect(Collectors.joining()));
-                isTargetContent = true;
+                if (weight == 0.0) {
+                    String tempWeight = line.split("WEIGHT : ")[1].split(" ")[0];
+                    IntStream stream = tempWeight.chars();
+                    weight = Double.parseDouble(stream.filter((ch) -> (48 <= ch && ch <= 57) || (ch == 46)).mapToObj(ch -> (char) ch)
+                            .map(Object::toString)
+                            .collect(Collectors.joining()));
+                    isTargetContent = true;
+                }
             }
 
             if (line.contains("FIBER CONTENT:")) {
@@ -449,7 +454,7 @@ public class InvoiceExcelService {
         } else if (targetData.get(8).startsWith("WIDTH") && targetData.get(9).startsWith("WEIGHT")) {
             result.setProductName2(targetData.get(8) + " " + targetData.get(9)); // WIDTH, WEIGHT
         }
-        result.setProductName3(firstLine, material.isLastSameMaterial());
+        result.setProductName3(firstLine);
         result.setFabric(material.getFabric());
         result.setFiberContentOrigin(strBuilder.toString());
         result.setCount(material.getQuantity());
