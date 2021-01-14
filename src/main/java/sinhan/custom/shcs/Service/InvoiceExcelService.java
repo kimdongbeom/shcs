@@ -316,7 +316,7 @@ public class InvoiceExcelService {
             result.setProductCode("");
             result.setProductName1("(" + packing.getPackingId() + ")");
             result.setProductName2(packing.getName()); // WIDTH, WEIGHT
-            result.setProductName3("");
+            result.setProductName3PureValue("");
             result.setFabric("");
             result.setFiberContent1("(" + packing.getPackingId() + ")");
             result.setFiberContent2(packing.getName());

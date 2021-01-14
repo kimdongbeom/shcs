@@ -64,6 +64,10 @@ public class ResultExcel {
         this.productName3 = changedProductName3;
     }
 
+    public void setProductName3PureValue(String hsCode) {
+        this.productName3 = hsCode;
+    }
+
     public void setProductName3(String hsCode) {
         String hsCodeMiddleValue = hsCode.split("\\.")[1]; //6006.22.0000  => 22,32,42이면 DYED, 24,34,44 이면 PRINT
         String hsCodeValue = "";
