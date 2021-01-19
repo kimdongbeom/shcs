@@ -167,22 +167,6 @@ public class InvoiceExcelService {
             }
             resultExcelList = findMatchedPdfAndMakeData(targetMaterialList, targetPackingList);
 
-
-
-
-
-            /*
-                todo
-                1. 만들어진 materialList와 packingList를 하나의 모델값으로 변경
-                2. 원단정보와 매칭되는 PDF파일을 찾아 매핑되는 정보를 가져와 모델로 만듬
-                3. 만들어진 모델 정보로 결과 파일인 excel을 만듬
-                4. PDF를 업로드하는 페이지 작업 (이름 중복시 덮어씌움)
-                5. PDF검색 기능 작업
-                6. 엑셀업로드 작업
-                7. 업로드 된 이후 '작업시작' 버튼 눌러 결과 EXCEL 다운로드
-             */
-
-            //
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -298,6 +282,17 @@ public class InvoiceExcelService {
             System.out.println(lines.length);
         }
 
+        for (int i=0; i < resultExcels.size(); i++) {
+            if (i+1 < resultExcels.size()) {
+                // 만약 다음 result모델 값과 HSCODE가 같지 않다면 i 모델의 HSCODE에 ATTACHED ITEM을 붙여줌
+                if (!resultExcels.get(i).getHsCode().equals(resultExcels.get(i+1).getHsCode())) {
+                    String origin = resultExcels.get(i).getProductName3();
+                    String changedOrigin = origin + "ATTACHED ITEM";
+                    resultExcels.get(i).appendProductName3(changedOrigin);
+                }
+            }
+        }
+
         double materialUnitPriceSum = resultExcels.stream().map(x -> x.getCalculateWeight()).reduce(0.0, (a,b) -> a + b);
 
         if (packingList.size() != 0) {
@@ -312,9 +307,13 @@ public class InvoiceExcelService {
         for (Packing packing : packingList) {
             ResultExcel result = new ResultExcel();
 
+            String changePackingId = packing.getPackingId().replaceFirst("-", "=");
+            String tempPackingId = changePackingId.replace("-", "");
+            String resultMaterialId = tempPackingId.replace("=", "-");
+
             result.setInvoiceNo(packing.getInvoiceNo());
             result.setProductCode("");
-            result.setProductName1("(" + packing.getPackingId() + ")");
+            result.setProductName1("(" + resultMaterialId + ")");
             result.setProductName2(packing.getName()); // WIDTH, WEIGHT
             result.setProductName3PureValue("");
             result.setFabric("");
@@ -372,17 +371,6 @@ public class InvoiceExcelService {
             }
         }
 
-        for (int i=0; i < resultMaterialExcelList.size(); i++) {
-            if (i+1 < resultMaterialExcelList.size()) {
-                // 만약 다음 result모델 값과 HSCODE가 같지 않다면 i 모델의 HSCODE에 ATTACHED ITEM을 붙여줌
-                if (!resultMaterialExcelList.get(i).getHsCode().equals(resultMaterialExcelList.get(i+1).getHsCode())) {
-                    String origin = resultMaterialExcelList.get(i).getProductName3();
-                    String changedOrigin = origin + "ATTACHED ITEM";
-                    resultMaterialExcelList.get(i).appendProductName3(changedOrigin);
-                }
-            }
-        }
-
         return resultMaterialExcelList;
     }
 
@@ -434,7 +422,11 @@ public class InvoiceExcelService {
             }
 
             if (isTargetContent) {
-                strBuilder.append(appendLine.replace("  ", " "));
+                if ((line.startsWith("/") && line.contains("--")) || line.equals("KNITTED FABRIC")) {
+                    continue;
+                } else {
+                    strBuilder.append(appendLine.replace("  ", " "));
+                }
             }
         }
 
