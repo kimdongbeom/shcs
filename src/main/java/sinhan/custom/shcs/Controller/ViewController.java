@@ -1,26 +1,60 @@
 package sinhan.custom.shcs.Controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import sinhan.custom.shcs.ExcelView.BoschExcelView;
+import sinhan.custom.shcs.ExcelView.InvoiceExcelView;
 import sinhan.custom.shcs.ExcelView.LenovoExcelView;
+import sinhan.custom.shcs.Service.InvoiceExcelService;
+import sinhan.custom.shcs.model.FileInfo;
 import sinhan.custom.shcs.model.Lenovo;
 import sinhan.custom.shcs.model.PDFExtractData;
+import sinhan.custom.shcs.model.ResultExcel;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Controller
 public class ViewController {
 
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+    @Value("${da.pdf.upload.dir}")
+    private String daPdfUploadDir;
+
+    @Autowired
+    private InvoiceExcelService invoiceExcelService;
+
     @GetMapping("/")
     public String main(Model model, @RequestParam(value = "param", defaultValue = "bosch") String param) {
+        File dir = new File(daPdfUploadDir);
+        File files[] = dir.listFiles();
+        List<FileInfo> fileList = new ArrayList<>();
+
+        exceptNotPdfFile(files, fileList, ".pdf");
+
         model.addAttribute("service", param);
+        model.addAttribute("fileList", fileList);
+
         return "home";
     }
 
@@ -56,4 +90,98 @@ public class ViewController {
         return new ModelAndView(new LenovoExcelView());
     }
 
+    @PostMapping("/upload/pdf/da")
+    public String uploadDaPDF(Model model, @RequestParam("file") MultipartFile multipartFile) {
+        try {
+            multipartFile.transferTo(new File(daPdfUploadDir + multipartFile.getOriginalFilename()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        File dir = new File(daPdfUploadDir);
+        File files[] = dir.listFiles();
+        List<FileInfo> fileList = new ArrayList<>();
+
+        exceptNotPdfFile(files, fileList, ".pdf");
+
+        model.addAttribute("fileList", fileList);
+        return "home ::#fileList";
+    }
+
+    @GetMapping("/search/pdf")
+    public String searchPdfFile(Model model, @RequestParam("query") String query) {
+        File dir = new File(daPdfUploadDir);
+        File files[] = dir.listFiles();
+        List<FileInfo> fileList = new ArrayList<>();
+
+        exceptNotPdfFile(files, fileList, query);
+
+        model.addAttribute("fileList", fileList);
+        return "home ::#fileList";
+    }
+
+    @GetMapping("/delete/pdf")
+    public String deletePDF(Model model, @RequestParam("file") String fileName) {
+        File dir = new File(daPdfUploadDir);
+        File files[] = dir.listFiles();
+        for (File file : files) {
+            if (file.getName().equals(fileName)) {
+                file.delete();
+            }
+        }
+
+        File filesAfterDelete[] = dir.listFiles();
+        List<FileInfo> fileList = new ArrayList<>();
+
+        exceptNotPdfFile(filesAfterDelete, fileList, ".pdf");
+
+        model.addAttribute("fileList", fileList);
+        return "home ::#fileList";
+    }
+
+    @GetMapping("/preview/pdf")
+    public void previewPDF(Model model, @RequestParam("file") String fileName, HttpServletResponse response) {
+        try {
+            DefaultResourceLoader loader = new DefaultResourceLoader();
+            FileInputStream is = new FileInputStream(daPdfUploadDir + fileName);
+            IOUtils.copy(is, response.getOutputStream());
+            response.setHeader("Content-Disposition", "attachment; filename=Accepted.pdf");
+            response.flushBuffer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void exceptNotPdfFile(File[] filesAfterDelete, List<FileInfo> fileList, String s) {
+        List<FileInfo> fileInfos = new ArrayList<>();
+        if (filesAfterDelete != null) {
+            for (File file : filesAfterDelete) {
+                if (file.getName().contains(s)) {
+                    long lastModified = file.lastModified();
+                    FileInfo fileInfo = new FileInfo();
+                    String pattern = "yyyy-MM-dd hh:mm:ss";
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                    fileList.add(new FileInfo(file.getName(), simpleDateFormat.format(lastModified)));
+                }
+            }
+        }
+    }
+
+    @PostMapping(value = "/convert/excel", produces = "application/vnd.ms-excel")
+    public ModelAndView downloadExcel(Model model, @RequestParam("file") MultipartFile multipartFile, HttpServletResponse response) {
+        try {
+            List<ResultExcel> resultExcels = invoiceExcelService.convertExcelToResultModel(multipartFile);
+            String excelName = multipartFile.getOriginalFilename().split("\\.")[0] + "_converted_excel.xls";
+            model.addAttribute("rows", resultExcels);
+
+            response.setContentType("application/ms-excel");
+            response.setHeader("Content-disposition", "attachment; filename=" + excelName);
+        } catch (Exception e) {
+            log.error("Convert Excel is Error", e);
+            ModelAndView mav = new ModelAndView("errorPage");
+            return mav;
+        }
+
+        return new ModelAndView(new InvoiceExcelView());
+    }
 }

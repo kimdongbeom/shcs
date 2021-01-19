@@ -2,7 +2,6 @@ $(document).ready(function() {
 
     $("#btnSubmitLenovo").click(function (e) {
         //preventDefault 는 기본으로 정의된 이벤트를 작동하지 못하게 하는 메서드이다. submit을 막음
-        debugger;
         e.preventDefault();
         var form = $('#fileUploadFormLenovo')[0];
         var data = new FormData(form);
@@ -34,7 +33,7 @@ $(document).ready(function() {
             }
         });
         e.stopPropagation();
-    })
+    });
 
     function windowOpenInPostLenovo(fileName, dataList)
     {
@@ -44,7 +43,7 @@ $(document).ready(function() {
         mapFormLenovo.method = "POST";
         mapFormLenovo.target ="target";
         mapFormLenovo.action = "/excel/lenovo";
-        debugger;
+
         if (dataList.length > 0){
             var mapInput = document.createElement("input");
             mapInput.type = "hidden";
