@@ -55,6 +55,8 @@ public class ResultExcel {
         String hsCodeFirstValue = hsCode.split("\\.")[0]; //6006.22.0000
         if (hsCodeFirstValue.startsWith("5")) {
             this.productName1 = "(" + materialId + ") WOVEN KNITTED FABRIC";
+        } else if (hsCodeFirstValue.startsWith("6001")) {
+            this.productName1 = "(" + materialId + ") TERRY FABRIC";
         } else {
             this.productName1 = "(" + materialId + ") KNITTED FABRIC";
         }
@@ -69,21 +71,35 @@ public class ResultExcel {
     }
 
     public void setProductName3(String hsCode) {
+        String hsCodeFirstValue = hsCode.split("\\.")[0];
         String hsCodeMiddleValue = hsCode.split("\\.")[1]; //6006.22.0000  => 22,32,42이면 DYED, 24,34,44 이면 PRINT
+        String hsCodeEndValue = hsCode.split("\\.")[2];
         String hsCodeValue = "";
 
-        if (hsCode.split("\\.")[0].startsWith("6006")) {
+        if (hsCodeFirstValue.startsWith("6006")) {
             if (hsCodeMiddleValue.endsWith("22") || hsCodeMiddleValue.endsWith("32") || hsCodeMiddleValue.endsWith("42")) {
                 hsCodeValue = "DYED ";
             } else if (hsCodeMiddleValue.endsWith("24") || hsCodeMiddleValue.endsWith("34") || hsCodeMiddleValue.endsWith("44")) {
                 hsCodeValue = "PRINT ";
             } else if (hsCodeMiddleValue.endsWith("31") || hsCodeMiddleValue.endsWith("32") || hsCodeMiddleValue.endsWith("33") || hsCodeMiddleValue.endsWith("39")) {
                 hsCodeValue = "DYED ";
+            } else if (hsCodeMiddleValue.endsWith("23") || hsCodeMiddleValue.endsWith("33") || hsCodeMiddleValue.endsWith("39")) {
+                hsCodeValue = "YARN DYED";
             }
-        } else if (hsCode.split("\\.")[0].startsWith("5208")) {
+        } else if (hsCodeFirstValue.startsWith("5208")) {
             if (hsCodeMiddleValue.endsWith("23") || hsCodeMiddleValue.endsWith("33") || hsCodeMiddleValue.endsWith("43") || hsCodeMiddleValue.endsWith("39")) {
                 hsCodeValue = "YARN DYED ";
+            } else if (hsCodeMiddleValue.endsWith("31") || hsCodeMiddleValue.endsWith("32") || hsCodeMiddleValue.endsWith("33") || hsCodeMiddleValue.endsWith("39")) {
+                hsCodeValue = "DYED ";
             }
+        } else if (hsCodeFirstValue.startsWith("5407")) {
+            if ((hsCodeMiddleValue.endsWith("4") && hsCodeEndValue.endsWith("0000")) || hsCodeEndValue.startsWith("4000")) {
+                hsCodeValue = "PRINT ";
+            } else if ((hsCodeMiddleValue.endsWith("2") && hsCodeEndValue.endsWith("0000")) || hsCodeEndValue.startsWith("2000")) {
+                hsCodeValue = "DYED ";
+            }
+        } else if (hsCodeFirstValue.startsWith("5408")) {
+            hsCodeValue = "DYED ";
         }
 
         this.productName3 = hsCodeValue;

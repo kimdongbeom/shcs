@@ -290,6 +290,10 @@ public class InvoiceExcelService {
                     String changedOrigin = origin + "ATTACHED ITEM";
                     resultExcels.get(i).appendProductName3(changedOrigin);
                 }
+            } else if (i == resultExcels.size() - 1) {
+                String origin = resultExcels.get(i).getProductName3();
+                String changedOrigin = origin + "ATTACHED ITEM";
+                resultExcels.get(i).appendProductName3(changedOrigin);
             }
         }
 
@@ -436,7 +440,7 @@ public class InvoiceExcelService {
 
         result.setInvoiceNo(material.getInvoiceNo());
         result.setProductCode(resultMaterialId + material.getUnitPrice());
-        result.setProductName1("(" + resultMaterialId + ") KNITTED FABRIC");
+        result.setProductName1(resultMaterialId, material.getHsCode());
         if (targetData.get(4).startsWith("WIDTH") && targetData.get(5).startsWith("WEIGHT")) {
             result.setProductName2(targetData.get(4) + " " + targetData.get(5)); // WIDTH, WEIGHT
         } else if (targetData.get(5).startsWith("WIDTH") && targetData.get(6).startsWith("WEIGHT")) {
