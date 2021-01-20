@@ -54,7 +54,7 @@ public class ResultExcel {
     public void setProductName1(String materialId, String hsCode) {
         String hsCodeFirstValue = hsCode.split("\\.")[0]; //6006.22.0000
         if (hsCodeFirstValue.startsWith("5")) {
-            this.productName1 = "(" + materialId + ") WOVEN KNITTED FABRIC";
+            this.productName1 = "(" + materialId + ") WOVEN FABRIC";
         } else if (hsCodeFirstValue.startsWith("6001")) {
             this.productName1 = "(" + materialId + ") TERRY FABRIC";
         } else {
@@ -84,7 +84,7 @@ public class ResultExcel {
             } else if (hsCodeMiddleValue.endsWith("31") || hsCodeMiddleValue.endsWith("32") || hsCodeMiddleValue.endsWith("33") || hsCodeMiddleValue.endsWith("39")) {
                 hsCodeValue = "DYED ";
             } else if (hsCodeMiddleValue.endsWith("23") || hsCodeMiddleValue.endsWith("33") || hsCodeMiddleValue.endsWith("39")) {
-                hsCodeValue = "YARN DYED";
+                hsCodeValue = "YARN DYED ";
             }
         } else if (hsCodeFirstValue.startsWith("5208")) {
             if (hsCodeMiddleValue.endsWith("23") || hsCodeMiddleValue.endsWith("33") || hsCodeMiddleValue.endsWith("43") || hsCodeMiddleValue.endsWith("39")) {
