@@ -75,7 +75,11 @@ public class LenovoExcelView extends AbstractXlsView {
             cell.setCellValue(data.getProductDescription());
 
             cell = row.createCell(3);
-            cell.setCellValue(Integer.parseInt(data.getQuantity()));
+            try {
+                cell.setCellValue(Integer.parseInt(data.getQuantity()));
+            } catch (Exception e) {
+                cell.setCellValue("###");
+            }
 
             cell = row.createCell(4);
             cell.setCellValue(data.getUom());
