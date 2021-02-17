@@ -75,7 +75,7 @@ public class TypeLenovoDELConvertService {
                                     String[] nextLine = lines[j].split(" ");
                                     if (nextLine.length == 7 && !nextLine[nextLine.length - 1].equals("DIMENSIONS") && StringUtils.isNotBlank(nextLine[0])) {
                                         productIdentification = lines[j-1].trim();
-                                        if (productIdentification.equals("FCA Free carrier")) {
+                                        if (productIdentification.equals("FCA Free carrier") || productIdentification.equals("FOB Free on board")) {
                                             productIdentification = lines[i+1].trim();
                                         }
                                         lenovo.splitLineDataDEL(lines[j]);
