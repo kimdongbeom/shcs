@@ -2,6 +2,7 @@ package sinhan.custom.shcs.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @NoArgsConstructor
@@ -46,9 +47,17 @@ public class Lenovo {
             setHtsCode(splitDatas[splitDatasLength - 5]);
             setCtryOfOrigin(splitDatas[splitDatasLength - 6]);
             setProductIdentification(splitDatas[splitDatasLength - 7]);
-            for(int i=0; i < splitDatasLength - 7; i++) {
-                unitProductDescription = unitProductDescription + splitDatas[i] + " ";
+            if (StringUtils.isNumeric(splitDatas[0]) && splitDatas[0].length() == 10) {
+                for(int i=1; i < splitDatasLength - 7; i++) {
+                    unitProductDescription = unitProductDescription + splitDatas[i] + " ";
+                }
+            } else {
+                for(int i=0; i < splitDatasLength - 7; i++) {
+                    unitProductDescription = unitProductDescription + splitDatas[i] + " ";
+                }
             }
+
+
         } else if (splitDatas[splitDatasLength - 5].length() == 2) {
             setCtryOfOrigin(splitDatas[splitDatasLength - 5]);
             setProductIdentification(splitDatas[splitDatasLength - 6]);

@@ -44,7 +44,24 @@ public class TypeLenovoDNConvertService {
 
                 if (isTargetBlock) {
                     String[] splitLine = line.split(" ");
-                    if (StringUtils.isNumeric(splitLine[0]) && splitLine[0].length() == 10 && splitLine.length == 2) {
+
+                    if (StringUtils.isNumeric(splitLine[0]) && splitLine[0].length() == 10 && splitLine.length == 2 && splitLine[0].startsWith("8")) {
+                        String[] splitTargetForMaterialNo = line.split(" ");
+                        lenovo.setInvoiceNo(lines[i+1]);
+
+                        for (int j=i; j < lines.length; j++) {
+                            String[] splitInnerLine = lines[j].split(" ");
+                            if (splitInnerLine.length > 7 && lines[j].contains("EA")) {
+                                lenovo.splitLineDataDN(lines[j]);
+                                break;
+                            }
+                        }
+
+                        resultDataList.add(lenovo);
+                        lenovo = new Lenovo();
+                    }
+
+                    if (StringUtils.isNumeric(splitLine[0]) && splitLine[0].length() == 10 && splitLine.length == 2 && !splitLine[0].startsWith("8")) {
                         String[] splitTargetForMaterialNo = line.split(" ");
                         lenovo.setInvoiceNo(lines[i+1]);
                         lenovo.splitLineDataDN(lines[i+4]);
